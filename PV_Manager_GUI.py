@@ -130,9 +130,9 @@ def evalChargeMode(chargeMode, sysData, settings):
                     access.ecSetChargerData("psm", sysData.reqPhases)
                     sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
-                access.ecSetChargerData("acs", "0", tout=10)  # authenticate
+                access.ecSetChargerData("acs", "0")  # authenticate
                 access.ecSetChargerData("amp", str(manualSettings['currentSet']))
-                access.ecSetChargerData("frc", "2", tout=10)  # ON
+                access.ecSetChargerData("frc", "2")  # ON
                 chargeMode = ChargeModes.FORCED
             else:
                 print('Phase change request -> wait, hold time', sysData.phaseHoldTimer.read())
@@ -223,10 +223,27 @@ while not exitApp:
     if t100ms > 10:
         t1s += 1
         t100ms = 0
-        print(t1s, ' ', end='')
+        print('.', end='')
+        # read charger data
+        if (t1s % const.C_SYS_CHARGER_CLOCK) == 0 or ExecImmediate == True:
+            print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
+            pv_utils.ecGetChargerData(sysData)
+            #            chargeMode = evalChargeMode(chargeMode, sysData, settings)
+            ExecImmediate = False
+
+        # read car data
+        if (t1s % const.C_SYS_CAR_CLOCK) == 0:
+            #            ExecImmediate = False
+            if sysData.carPlugged:
+                print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
+                carData = access.ec_GetCarData()
+                print('Car data:', carData)
+                batteryLevel = carData['batteryLevel']
+                sysData.batteryLevel = carData['batteryLevel']
 
         # read solar data
         if (t1s % const.C_SYS_PV_CLOCK) == 0:
+            print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             pvData = access.ec_GetPVData(tout=20)
             if SIMULATE_PV_TO_GRID > 0:
                 pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
@@ -234,20 +251,6 @@ while not exitApp:
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
             chargeMode = evalChargeMode(chargeMode, sysData, settings)
 
-        # read charger data
-        if (t1s % const.C_SYS_CHARGER_CLOCK) == 0 or ExecImmediate == True:
-            pv_utils.ecGetChargerData(sysData)
-#            chargeMode = evalChargeMode(chargeMode, sysData, settings)
-            ExecImmediate = False
-
-        #read car data
-        if (t1s % const.C_SYS_CAR_CLOCK) == 0:
-#            ExecImmediate = False
-            if sysData.carPlugged:
-                carData = access.ec_GetCarData()
-                print('Car data:', carData)
-                batteryLevel = carData['batteryLevel']
-                sysData.batteryLevel = carData['batteryLevel']
 
         if sysData.carPlugged and forceFlag == True:
             done = popCharge.popCharge(batteryLevel=batteryLevel)

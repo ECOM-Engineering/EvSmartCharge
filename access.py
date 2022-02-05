@@ -127,7 +127,7 @@ def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=10):
 
 
 # noinspection SpellCheckingInspection
-def ecSetChargerData(param="amp", value="8", tout=5):
+def ecSetChargerData(param="amp", value="8", tout=10):
     """
     Set a single parameter of the charger
 
