@@ -28,9 +28,9 @@ C_CHARGER_GET_STATUS = "/status"
 C_CHARGER_SET_PARAM = "/set?"
 # V1 C_CHARGER_CLOUD_URL = "https://api.go-e.co/api_status?token=ad5bce7889"
 C_CHARGER_CLOUD_URL = "https://074368.api.v3.go-e.io/api/status?token=8UftBYBv29MufyIQbPDeRIBNG1KSLJSS"
-C_CHARGER_MIN_CURRENT = 7
-C_CHARGER_MAX_CURRENT = 15
-C_CHARGER_MAX_POWER = 11
+C_CHARGER_MIN_CURRENT = 7 #A
+C_CHARGER_MAX_CURRENT = 15 # A
+C_CHARGER_MAX_POWER = 11 # kw
 C_CHARGER_STATUS_TEXT = ("No Charger access", "No vehicle", "Charging", "Waiting for Vehicle ", "Connected, finished")
 #C_CHARGER_START_CMD = "alw"    # 1: charge
 C_CHARGER_START_CMD = "frc"     # 2: force, 1:stop
@@ -41,7 +41,7 @@ C_CHARGER_1_PHASE = "1"        # parameter psm
 
 # PV constants
 C_SOLAR_URL = "https://monitoringapi.solaredge.com/site/601283/currentPowerFlow.json?api_key=UBXKIEOBRR64GNOQ6G43M3BQBFSNES8H"
-C_PV_MIN_REMAIN = 0.1
+C_PV_MIN_REMAIN = 0.0
 
 # System costants - Timing
 C_SYS_BASE_CLOCK = 1            # seconds
