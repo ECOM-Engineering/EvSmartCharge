@@ -126,11 +126,12 @@ def evalChargeMode(chargeMode, sysData, settings):
                 sysData.reqPhases = const.C_CHARGER_1_PHASE
 
             if sysData.phaseHoldTimer.read() == 0:
+                access.ecSetChargerData("acs", "0")  # authenticate
+
                 if sysData.actPhases != sysData.reqPhases: # phase switch requested?
                     access.ecSetChargerData("psm", sysData.reqPhases)
                     sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
-                access.ecSetChargerData("acs", "0")  # authenticate
                 access.ecSetChargerData("amp", str(manualSettings['currentSet']))
                 access.ecSetChargerData("frc", "2")  # ON
                 chargeMode = ChargeModes.FORCED
@@ -143,9 +144,9 @@ def evalChargeMode(chargeMode, sysData, settings):
         if sysData.batteryLevel >= manualSettings['chargeLimit']:
            chargeMode = ChargeModes.IDLE
            print('CHARGE OFF, manual limit reached')
+           access.ecSetChargerData("acs", "0", 5)   # authentication
            access.ecSetChargerData("frc", "1", tout=10)  # OFF
            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)
-           access.ecSetChargerData("acs", "1", 5)  #authentication ON
 
 #    elif chargeMode == ChargeModes.STOPPED:
     if chargeMode == ChargeModes.STOPPED:
@@ -153,7 +154,7 @@ def evalChargeMode(chargeMode, sysData, settings):
         print('CHARGE STOPPED by user')
         access.ecSetChargerData("frc", "1", tout=10)  # OFF
         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
-        access.ecSetChargerData("acs", "1", 5)  # authentication ON
+        access.ecSetChargerData("acs", "1", 5)  # authentication required
 
 #    elif chargeMode == ChargeModes.IDLE:
     if chargeMode == ChargeModes.IDLE:
@@ -176,11 +177,14 @@ def evalChargeMode(chargeMode, sysData, settings):
                 chargeMode = ChargeModes.IDLE
                 print('Charge OFF')
                 access.ecSetChargerData("frc", "1", tout=10)  # OFF
-                access.ecSetChargerData("acs", "1", 5)  # authentication ON
+                access.ecSetChargerData("acs", "1", 5)  # authentication required
                 sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
         else:
             access.ecSetChargerData("amp", str(freeSolarCurrent))  # addpt to actual level and continue  PV
             print('Current 1P:', sysData.calcPvCurrent_1P,' 3P: ', sysData.calcPvCurrent_3P, 'PhaseRequest', sysData.reqPhases)
+            if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
+                access.ecSetChargerData("psm", sysData.reqPhases)
+                sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
     elif chargeMode == ChargeModes.EXTERN:
         if sysData.chargePower == 0:
@@ -192,6 +196,7 @@ def evalChargeMode(chargeMode, sysData, settings):
 
 sysData.phaseHoldTimer = pv_utils.EcTimer()
 sysData.pvHoldTimer = pv_utils.EcTimer()
+sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME) # prevent early phase switch
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
@@ -200,7 +205,7 @@ while not exitApp:
     if event == 'Quit' or event == sg.WIN_CLOSED:
         access.ecSetChargerData("frc", "1", 5)  #switch charging OFF
         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
-        access.ecSetChargerData("acs", "1", 5)  #authentication ON
+        access.ecSetChargerData("acs", "1", 5)  #authentication required
         exitApp = True
     elif event == 'Force Charge':
 #            manualSettings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)['manual']
