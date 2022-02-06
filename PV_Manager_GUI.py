@@ -56,7 +56,7 @@ layout = [[sg.Column(col1)],
           ]
 
 # create window`
-window = sg.Window('ECOM PV Manager', layout)
+window = sg.Window('ECOM ECS-1 Solar Charging Manager', layout)
 batt_bar = window['-battBar-']
 solar_bar = window['-solarBar-']
 charge_bar = window['-chargeBar-']
@@ -182,9 +182,10 @@ def evalChargeMode(chargeMode, sysData, settings):
         else:
             access.ecSetChargerData("amp", str(freeSolarCurrent))  # addpt to actual level and continue  PV
             print('Current 1P:', sysData.calcPvCurrent_1P,' 3P: ', sysData.calcPvCurrent_3P, 'PhaseRequest', sysData.reqPhases)
-            if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
-                access.ecSetChargerData("psm", sysData.reqPhases)
-                sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
+            if sysData.phaseHoldTimer.read() == 0:
+                if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
+                    access.ecSetChargerData("psm", sysData.reqPhases)
+                    sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
     elif chargeMode == ChargeModes.EXTERN:
         if sysData.chargePower == 0:
