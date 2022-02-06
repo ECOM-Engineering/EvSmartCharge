@@ -92,7 +92,8 @@ pvChargeOn = False
 chargeState = 0
 exitApp = False
 batteryLevel = 0
-forceFlag = 'IDLE'
+forceFlag = False
+
 
 try:
     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
@@ -112,8 +113,10 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     pvSettings = settings['pv']
     manualSettings = settings['manual']
+    pvAllow3phases = pvSettings['3_phases']
+
     pv_utils.calcChargeCurrent(sysData,
-                               pvSettings['max_1_Ph_current'], pvSettings['min_3_Ph_current']) 
+                               pvSettings['max_1_Ph_current'], pvSettings['min_3_Ph_current'])
     freeSolarCurrent = sysData.calcPvCurrent_1P
     print('CHARGE-MODE ACTUAL:', chargeMode, end='')
 
@@ -182,11 +185,11 @@ def evalChargeMode(chargeMode, sysData, settings):
             access.ecSetChargerData("amp", str(freeSolarCurrent))  # addpt to actual level and continue  PV
             print('Current 1P:', sysData.calcPvCurrent_1P, ' 3P: ', sysData.calcPvCurrent_3P, 'PhaseRequest',
                   sysData.reqPhases)
-            if sysData.phaseHoldTimer.read() == 0:
+            if sysData.phaseHoldTimer.read() == 0 and pvAllow3phases:
                 if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
                     access.ecSetChargerData("psm", sysData.reqPhases)
+                    # sysData.actPhases = sysData.reqPhases  #should be done at read charger data
                     sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
-
     elif chargeMode == ChargeModes.EXTERN:
         if sysData.chargePower == 0:
             chargeMode = ChargeModes.IDLE
@@ -218,7 +221,7 @@ while not exitApp:
     elif event == 'PV-Settings':
         done = popSettings.popSettings(batteryLevel=batteryLevel)
         if done:
-            pvSettings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)['pv']
+            settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
 
     # MAIN LOOP ------------------------------------------------------------------------------------------------------
     # main time division for 1s base tick

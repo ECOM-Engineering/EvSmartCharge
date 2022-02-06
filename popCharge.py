@@ -58,7 +58,7 @@ def popCharge(batteryLevel=20, currentLimit = 16, file = const.C_DEFAULT_SETTING
             done = False
             break
         if ev2 == 'Charge!':
-            manualSettings['cancelled'] = False
+#            manualSettings['cancelled'] = False
             manualSettings['currentSet'] = int(val2['-CURRENT-'])
             manualSettings['3_phases'] = val2['-3_PHASES-']
             manualSettings['chargeLimit'] = val2['-CHARGE LIMIT-']

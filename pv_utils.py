@@ -24,9 +24,9 @@ class sysData:  # kind of C structure
     currentL1 = 0  # A
     voltageL1 = 0
     chargeActive = False
-    measuredPhases = 0  # 1 | 3 measured number of measuredPhases
+    measuredPhases = 0  # 1 | 3 number of measuredPhases
     actPhases = "0"  # actual charger psm setting (C_CHARGER_x_PHASE)
-    reqPhases = "0"
+    reqPhases = "0"  # requested phase by user or PV situation
     calcPvCurrent_1P = 0  # calculated 1 phase current, limited to max. setting
     calcPvCurrent_3P = 0  # calculated 3 phase current, if pvToGrid > minimum 3 phase current
     pvHoldTimer = 'none'
