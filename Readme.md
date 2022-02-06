@@ -35,8 +35,6 @@ This software may be reused and adapted under respecting the MIT License. It is 
 
 [SolarEdge API](https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf)
 
-https://github.com/niosega/zozo) Renault Zoe Server Access API  
-
 [zozo](https://github.com/niosega/zozo) Renault ZOE server access library
 
 
