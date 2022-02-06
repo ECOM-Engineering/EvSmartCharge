@@ -2,7 +2,7 @@
     "manual": {
         "currentSet": 8,
         "chargeLimit": 83.0,
-        "3_phases": true,
+        "3_phases": false,
         "phaseSet": true,
         "cancelled": false
     },

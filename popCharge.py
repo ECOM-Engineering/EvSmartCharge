@@ -3,6 +3,7 @@ import const
 import sysSettings
 
 
+# noinspection PySimplifyBooleanCheck
 def popCharge(batteryLevel=20, currentLimit = 16, file = const.C_DEFAULT_SETTINGS_FILE):
     """
     Function reads settings file and writes back if there are changes by the operator
@@ -10,7 +11,6 @@ def popCharge(batteryLevel=20, currentLimit = 16, file = const.C_DEFAULT_SETTING
     :param batteryLevel:    actual level in %
     :param currentLimit:    max allowed charge current
     :param file:            json file containing manual settings under key 'manual'
-    :param currentSet:      charge current in A
     :return:                Dict {'manual': {'cancelled', 'currentSet', 'chargeLimit', '3_phases'}}
     """
     try:
@@ -35,7 +35,7 @@ def popCharge(batteryLevel=20, currentLimit = 16, file = const.C_DEFAULT_SETTING
                    [sg.Text('Charge Current:', pad=0)],
                    [sg.Slider(k='-CURRENT-', default_value=currentSet, range=(6, currentLimit), orientation='h',
                               s=(25, 10), tick_interval=currentLimit / 8), sg.Text('A')],
-                   [sg.Radio('1 Phase', "RADIO1", default=not (phases)),
+                   [sg.Radio('1 Phase', "RADIO1", k='-1_PHASE-', default=not phases),
                     sg.Radio('3 Phases', "RADIO1", k='-3_PHASES-', default=phases)],
                    [sg.HSeparator(pad=(0, 1))],
                    #    [sg.Frame('', [[sg.Button('Cancel'), sg.Button('Charge!', focus=True)]])]]
@@ -43,11 +43,15 @@ def popCharge(batteryLevel=20, currentLimit = 16, file = const.C_DEFAULT_SETTING
 
     # test global padding    popWin = sg.Window('Manual Charge Options',  layout_popC, element_padding=0)
     popWin = sg.Window('Manual Charge Options', layout_popC)
-#    p = popWin['battLevel']
-    if phaseSet == False:
-        sg.Radio.visible = False
+#    if phaseSet == False:
+#        popWin['-3_PHASES-'].update(visible = False)
+#        sg.Radio.visible = False
     while True:
         ev2, val2 = popWin.read(100)
+        if phaseSet == False:
+            popWin['-3_PHASES-'].update(visible=False)
+            popWin['-1_PHASE-'].update(visible=False)
+
         popWin['-BATT_LEVEL BAR-'].UpdateBar(batteryLevel)
         popWin['-BATT_LEVEL DISP-'].update(batteryLevel)
         if ev2 == sg.WIN_CLOSED or ev2 == 'Cancel':

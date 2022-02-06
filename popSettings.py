@@ -3,11 +3,11 @@ import sysSettings
 import const
 
 
-def popSettings(batteryLevel=40, currentLimit = 16, file = const.C_DEFAULT_SETTINGS_FILE):
+def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE):
     """
     Function reads settings file and writes back if there are changes by the operator
 
-    :return:                Dict {'manual': {'cancelled', 'currentSet', 'chargeLimit', '3_phases'}}
+    :return: False, if cancelled
     """
 
     try:
@@ -24,14 +24,14 @@ def popSettings(batteryLevel=40, currentLimit = 16, file = const.C_DEFAULT_SETTI
     phases = pvSettings['3_phases']
     layout_popC = [[sg.Text('Battery Level:', pad=0)],
                    [sg.ProgressBar(100, orientation='h', size=(20, 10), key='battLevel',
-                                   bar_color=('lightgreen','grey')), sg.Text(batteryLevel, key='-battLevel-', pad=0), sg.Text('%')],
+                                   bar_color=('lightgreen', 'grey')), sg.Text(batteryLevel, key='-battLevel-', pad=0), sg.Text('%')],
                    [sg.Text('Charge Limit:', pad=0)],
                    [sg.Slider(k='-CHARGE LIMIT-', default_value=chargeLimit, range=(20, 100), orientation='h', enable_events=True,
                               s=(25, 10), tick_interval=20, disable_number_display=False), sg.Text('%')],
                    [sg.HSeparator(pad=(0, 10))],
-                   [sg.Input(max_I_1Ph, key='-MAX_I_1_PH-', size =( 2,1),border_width=2), sg.Text('Max. 1 Phase Current:')],
-                   [sg.Checkbox('   Allow 3 Phases', key='-3_PHASES-', pad=((4, 0),(8,0)), default=phases)],
-                   [sg.Input(min_I_3Ph, key='-MIN_I_3_PH-', size =( 2,1),border_width=2, disabled_readonly_background_color = 'Grey'),sg.Text("Min. 3 Phase Current")],
+                   [sg.Input(max_I_1Ph, key='-MAX_I_1_PH-', size=(2, 1), border_width=2), sg.Text('Max. 1 Phase Current:')],
+                   [sg.Checkbox('   Allow 3 Phases', key='-3_PHASES-', pad=((4, 0), (8, 0)), default=phases)],
+                   [sg.Input(min_I_3Ph, key='-MIN_I_3_PH-', size=(2, 1), border_width=2, disabled_readonly_background_color='Grey'), sg.Text("Min. 3 Phase Current")],
                    [sg.HSeparator(pad=(0, 10))],
                    #    [sg.Frame('', [[sg.Button('Cancel'), sg.Button('Charge!', focus=True)]])]]
                    [sg.Button('Cancel', size=12), sg.Button('Store!', size=12, focus=True)]]
@@ -59,6 +59,7 @@ def popSettings(batteryLevel=40, currentLimit = 16, file = const.C_DEFAULT_SETTI
                 popWin['-CHARGE LIMIT-'].update(batteryLevel)
             #    print(manualSettings)
 
+        # noinspection PySimplifyBooleanCheck
         if val2['-3_PHASES-'] == True:
             popWin['-MIN_I_3_PH-'].update(disabled = False)
         else:
@@ -73,3 +74,4 @@ def popSettings(batteryLevel=40, currentLimit = 16, file = const.C_DEFAULT_SETTI
 if __name__ == "__main__":
     result = popSettings()
     print(result)
+

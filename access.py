@@ -28,6 +28,7 @@ def ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False):
     print('\nObtaining weather data ...')
     description = ''
     temperature = -9999
+    clouds = -1
     weatherForecast = {'statusCode': 0, 'forecastDate': 0, 'clouds': 0, 'temp': -9999, 'weather': "?"}
     localDate = date.today()
     forecastDate = localDate + timedelta(days)
@@ -95,6 +96,7 @@ def ec_GetCarData():
     return carData
 
 
+# noinspection PyPep8
 def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=10):
     """
     Get data from charger from WLAN or Cloud.
@@ -106,9 +108,9 @@ def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=10):
 
     # API V1 see: https://github.com/goecharger/go-eCharger-API-v1
     # API V1 see: https://github.com/goecharger/go-eCharger-API-v2
-    print('\nObtaining charger data ...') #
-#v1    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx' : 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'err': -1}
-    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx' : 0, 'frc': 0, 'nrg': 15 * [0], 'fsp':'true', 'psm': 1, 'wh': 0, 'dwo': 0, 'err': -1}
+    print('\nObtaining charger data ...')
+# v1    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx' : 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'err': -1}
+    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx': 0, 'frc': 0, 'nrg': 15 * [0], 'fsp': 'true', 'psm': 1, 'wh': 0, 'dwo': 0, 'err': -1}
     try:
         response = requests.get(url + const.C_CHARGER_GET_STATUS, timeout=tout)
         statusCode = response.status_code
@@ -169,13 +171,15 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=10):
     except:
         pvData['statusCode'] = "exception"
 
-    print( pvData)
-    return(pvData)
+    print(pvData)
+    return pvData
 
-if __name__ == "__main__": # test only
+# test only
+if __name__ == "__main__":
+
 #    ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False)
 #    ec_GetCarData()
-    print("API Version =",const.C_CHARGER_API_VERSION)
+    print("API Version =", const.C_CHARGER_API_VERSION)
     ecReadChargerData()
     ecSetChargerData("amp", "8")
 

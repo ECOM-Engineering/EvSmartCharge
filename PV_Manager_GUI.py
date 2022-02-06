@@ -16,7 +16,6 @@ chargePwrBar = sg.ProgressBar(const.C_CHARGER_MAX_POWER, orientation='h', size=(
 solarPwrBar = sg.ProgressBar(6, orientation='h', size=(20, 14), key='-solarBar-', bar_color=('yellow', 'grey'))
 solarPwr2GridBar = sg.ProgressBar(6, orientation='h', size=(20, 14), key='-toGridBar-', bar_color=('yellow', 'grey'))
 
-
 battDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-batt-')
 solarDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-solar-')
 chargeDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-charge-')
@@ -62,10 +61,10 @@ solar_bar = window['-solarBar-']
 charge_bar = window['-chargeBar-']
 toGrid_bar = window['-toGridBar-']
 
-
 # ------------------------------------- data acquisition -------------------------------------
 
 SIMULATE_PV_TO_GRID = 0
+
 
 class ChargeModes:  # kind of enum
     IDLE = 0
@@ -74,6 +73,7 @@ class ChargeModes:  # kind of enum
     EXTERN = 3
     STOPPED = 4
     FORCE_REQUEST = 5
+
 
 chargeMode = ChargeModes.IDLE  # default
 oldChargeMode = chargeMode
@@ -91,6 +91,7 @@ pvData = None
 pvChargeOn = False
 chargeState = 0
 exitApp = False
+batteryLevel = 0
 forceFlag = 'IDLE'
 
 try:
@@ -98,23 +99,21 @@ try:
 except:
     settings = sysSettings.defaultSettings
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
-#manualSettings = settings['manual']
-#pvSettings = settings['pv']
 
 
 def evalChargeMode(chargeMode, sysData, settings):
-    ''' State machine depending on realtime data and user intervenrion
+    """ State machine depending on realtime data and user intervenrion
 
     :param chargeMode:  enum like construct defined in class ChargeModes
     :param sysData: C structure like record defined in class sysData
     :param settings: data from PV_Manager.json file
     :return: processed charge mode
-    '''
+    """
 
     pvSettings = settings['pv']
     manualSettings = settings['manual']
     pv_utils.calcChargeCurrent(sysData,
-                               pvSettings['max_1_Ph_current'], pvSettings['min_3_Ph_current'] ) #todo: int()
+                               pvSettings['max_1_Ph_current'], pvSettings['min_3_Ph_current']) 
     freeSolarCurrent = sysData.calcPvCurrent_1P
     print('CHARGE-MODE ACTUAL:', chargeMode, end='')
 
@@ -128,7 +127,7 @@ def evalChargeMode(chargeMode, sysData, settings):
             if sysData.phaseHoldTimer.read() == 0:
                 access.ecSetChargerData("acs", "0")  # authenticate
 
-                if sysData.actPhases != sysData.reqPhases: # phase switch requested?
+                if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
                     access.ecSetChargerData("psm", sysData.reqPhases)
                     sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
@@ -142,13 +141,13 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     if chargeMode == ChargeModes.FORCED:
         if sysData.batteryLevel >= manualSettings['chargeLimit']:
-           chargeMode = ChargeModes.IDLE
-           print('CHARGE OFF, manual limit reached')
-           access.ecSetChargerData("acs", "0", 5)   # authentication
-           access.ecSetChargerData("frc", "1", tout=10)  # OFF
-           access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)
+            chargeMode = ChargeModes.IDLE
+            print('CHARGE OFF, manual limit reached')
+            access.ecSetChargerData("acs", "0", 5)  # authentication
+            access.ecSetChargerData("frc", "1", tout=10)  # OFF
+            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)
 
-#    elif chargeMode == ChargeModes.STOPPED:
+    #    elif chargeMode == ChargeModes.STOPPED:
     if chargeMode == ChargeModes.STOPPED:
         chargeMode = ChargeModes.IDLE
         print('CHARGE STOPPED by user')
@@ -156,7 +155,7 @@ def evalChargeMode(chargeMode, sysData, settings):
         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
         access.ecSetChargerData("acs", "1", 5)  # authentication required
 
-#    elif chargeMode == ChargeModes.IDLE:
+    #    elif chargeMode == ChargeModes.IDLE:
     if chargeMode == ChargeModes.IDLE:
         if freeSolarCurrent >= const.C_CHARGER_MIN_CURRENT and sysData.batteryLevel < pvSettings['chargeLimit']:
             if sysData.pvHoldTimer.read() == 0:
@@ -170,7 +169,7 @@ def evalChargeMode(chargeMode, sysData, settings):
         elif sysData.chargePower > 1000:
             chargeMode = ChargeModes.EXTERN
 
-#    elif chargeMode == ChargeModes.PV:
+    #    elif chargeMode == ChargeModes.PV:
     if chargeMode == ChargeModes.PV:
         if freeSolarCurrent < const.C_CHARGER_MIN_CURRENT or sysData.batteryLevel >= pvSettings['chargeLimit']:
             if sysData.pvHoldTimer.read() == 0:
@@ -181,7 +180,8 @@ def evalChargeMode(chargeMode, sysData, settings):
                 sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
         else:
             access.ecSetChargerData("amp", str(freeSolarCurrent))  # addpt to actual level and continue  PV
-            print('Current 1P:', sysData.calcPvCurrent_1P,' 3P: ', sysData.calcPvCurrent_3P, 'PhaseRequest', sysData.reqPhases)
+            print('Current 1P:', sysData.calcPvCurrent_1P, ' 3P: ', sysData.calcPvCurrent_3P, 'PhaseRequest',
+                  sysData.reqPhases)
             if sysData.phaseHoldTimer.read() == 0:
                 if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
                     access.ecSetChargerData("psm", sysData.reqPhases)
@@ -195,35 +195,32 @@ def evalChargeMode(chargeMode, sysData, settings):
     print(' NEW:', chargeMode)
     return chargeMode
 
+
 sysData.phaseHoldTimer = pv_utils.EcTimer()
 sysData.pvHoldTimer = pv_utils.EcTimer()
-sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME) # prevent early phase switch
+sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)  # prevent early phase switch
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
     # cyclic check for user action
     event, values = window.read(timeout=100)
     if event == 'Quit' or event == sg.WIN_CLOSED:
-        access.ecSetChargerData("frc", "1", 5)  #switch charging OFF
+        access.ecSetChargerData("frc", "1", 5)  # switch charging OFF
         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
-        access.ecSetChargerData("acs", "1", 5)  #authentication required
+        access.ecSetChargerData("acs", "1", 5)  # authentication required
         exitApp = True
     elif event == 'Force Charge':
-#            manualSettings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)['manual']
-            forceFlag = True
+        forceFlag = True
     elif event == 'Stop Charge':
-        if chargeMode == ChargeModes.FORCED or chargeMode == ChargeModes.EXTERN :
+        if chargeMode == ChargeModes.FORCED or chargeMode == ChargeModes.EXTERN:
             chargeMode = ChargeModes.STOPPED
             ExecImmediate = True
-#        if chargeMode == ChargeModes.FORCED:
-#            chargeMode = ChargeModes.IDLE
-
     elif event == 'PV-Settings':
-       done = popSettings.popSettings(batteryLevel=batteryLevel)
-       if done:
+        done = popSettings.popSettings(batteryLevel=batteryLevel)
+        if done:
             pvSettings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)['pv']
 
-# MAIN LOOP ------------------------------------------------------------------------------------------------------
+    # MAIN LOOP ------------------------------------------------------------------------------------------------------
     # main time division for 1s base tick
     t100ms += 1
     if t100ms > 10:
@@ -257,7 +254,6 @@ while not exitApp:
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
             chargeMode = evalChargeMode(chargeMode, sysData, settings)
 
-
         if sysData.carPlugged and forceFlag == True:
             done = popCharge.popCharge(batteryLevel=batteryLevel)
             if done:
@@ -266,9 +262,8 @@ while not exitApp:
                 ExecImmediate = True
             forceFlag = False
 
-
     # ---------------------------------------- update display elements -------------------------------------------
-    if sysData.carPlugged and t1s == 1: # first run
+    if sysData.carPlugged and t1s == 1:  # first run
         window['Force Charge'].update(disabled=False)
         window['Stop Charge'].update(disabled=False)
 
@@ -309,7 +304,6 @@ while not exitApp:
     else:
         SetLED(window, '-LED_BAT', 'grey')
         SetLED(window, '-LED_CHARGE-', 'grey')
-
 
 # done with loop... need to destroy the window as it's still open
 window.close()
