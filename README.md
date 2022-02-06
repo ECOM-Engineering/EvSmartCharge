@@ -2,6 +2,7 @@
 Software controller for efficient charging of electric vehicles using home solar power 
 
 **This file and project is under construction**
+Source development is active in branch 'develop'
 
 ## Purpose
 
