@@ -1,12 +1,16 @@
 import time
 
 import PySimpleGUI as sg
+import os.path
+
 import const
 import access
 import pv_utils
 import sysSettings
 import popCharge
 import popSettings
+
+SIMULATE_PV_TO_GRID = 0
 
 sg.SetOptions(button_element_size=(11, 1), auto_size_buttons=False, font=('Arial', 10))
 
@@ -61,12 +65,11 @@ solar_bar = window['-solarBar-']
 charge_bar = window['-chargeBar-']
 toGrid_bar = window['-toGridBar-']
 
+
 # ------------------------------------- data acquisition -------------------------------------
 
-SIMULATE_PV_TO_GRID = 0
-
-
 class ChargeModes:  # kind of enum
+    """Constants defining system state."""
     IDLE = 0
     PV = 1
     FORCED = 2
@@ -75,15 +78,15 @@ class ChargeModes:  # kind of enum
     FORCE_REQUEST = 5
 
 
+# create objects
 chargeMode = ChargeModes.IDLE  # default
-oldChargeMode = chargeMode
-phases = 1
-oldPhases = phases
+oldChargeMode = chargeMode  # used for detection of state transitions
 
-sysData = pv_utils.sysData
+sysData = pv_utils.SysData
 sysData.pvHoldTimer = pv_utils.EcTimer()
 sysData.phaseHoldTimer = pv_utils.EcTimer()
 
+# initial of module global variables
 t100ms = 0
 t1s = -1
 ExecImmediate = False
@@ -94,20 +97,24 @@ exitApp = False
 batteryLevel = 0
 forceFlag = False
 
-
-try:
+# try:
+#     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
+# except:
+#     settings = sysSettings.defaultSettings
+#     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
+if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
-except:
+else:
     settings = sysSettings.defaultSettings
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
 
 
 def evalChargeMode(chargeMode, sysData, settings):
-    """ State machine depending on realtime data and user intervenrion
+    """ State machine depending on realtime data and user intervention
 
-    :param chargeMode:  enum like construct defined in class ChargeModes
-    :param sysData: C structure like record defined in class sysData
-    :param settings: data from PV_Manager.json file
+    :param chargeMode:  enum like construct defined as class ChargeModes
+    :param sysData: C structure like record defined as class SysData
+    :param settings: dictionary from PV_Manager.json file
     :return: processed charge mode
     """
 
@@ -188,7 +195,7 @@ def evalChargeMode(chargeMode, sysData, settings):
             if sysData.phaseHoldTimer.read() == 0 and pvAllow3phases:
                 if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
                     access.ecSetChargerData("psm", sysData.reqPhases)
-                    # sysData.actPhases = sysData.reqPhases  #should be done at read charger data
+                    # SysData.actPhases = SysData.reqPhases  #should be done at read charger data
                     sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
     elif chargeMode == ChargeModes.EXTERN:
         if sysData.chargePower == 0:
@@ -234,7 +241,6 @@ while not exitApp:
         if (t1s % const.C_SYS_CHARGER_CLOCK) == 0 or ExecImmediate == True:
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             pv_utils.ecGetChargerData(sysData)
-            #            chargeMode = evalChargeMode(chargeMode, sysData, settings)
             ExecImmediate = False
 
         # read car data
@@ -255,7 +261,8 @@ while not exitApp:
                 pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
             sysData.solarPower = round(pvData['pvPower'], 1)
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
-            chargeMode = evalChargeMode(chargeMode, sysData, settings)
+            if sysData.carPlugged:
+                chargeMode = evalChargeMode(chargeMode, sysData, settings)
 
         if sysData.carPlugged and forceFlag == True:
             done = popCharge.popCharge(batteryLevel=batteryLevel)

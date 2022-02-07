@@ -15,7 +15,7 @@ SIMULATE_PV_TO_GRID = 0
 # pvChargeOn = False
 # todo: newcurrent nur setzen. wenn änderung gegenüber istzustand ??
 
-class sysData:  # kind of C structure
+class SysData:  # kind of C structure
     carPlugged = False
     batteryLevel = 0  # %
     solarPower = 0  # kw
@@ -40,9 +40,9 @@ def ecGetChargerData(sysData):
     sysData.carPlugged = False
     if int(chargerData['car']) > 1:
         sysData.carPlugged = True
-        # V1                sysData.chargePower = chargerData['nrg'][11] / 100  # original value is in 10W
+        # V1                SysData.chargePower = chargerData['nrg'][11] / 100  # original value is in 10W
         sysData.chargePower = chargerData['nrg'][11]  # original value
-        # V1                sysData.currentL1 = chargerData['nrg'][4] / 100
+        # V1                SysData.currentL1 = chargerData['nrg'][4] / 100
         sysData.currentL1 = chargerData['nrg'][4]
         sysData.voltageL1 = chargerData['nrg'][0]
         if chargerData['nrg'][6] > 1:  # current on L3, if charging with 3 measuredPhases

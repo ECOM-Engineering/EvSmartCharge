@@ -1,14 +1,15 @@
 {
     "manual": {
         "currentSet": 12,
-        "chargeLimit": 88.0,
+        "chargeLimit": 89.0,
         "3_phases": false,
         "phaseSet": true
     },
     "pv": {
         "max_1_Ph_current": 14,
         "min_3_Ph_current": 8,
-        "chargeLimit": 86.0,
-        "3_phases": false
+        "chargeLimit": 87.0,
+        "3_phases": true,
+        "cancelled": true
     }
 }
