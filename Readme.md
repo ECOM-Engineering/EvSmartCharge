@@ -27,7 +27,7 @@ ECS-1 is a Python software running on different systems including Raspberry-Pi c
 
 ## Open Source
 
-This software may be reused and adapted under respecting the MIT License. It is based in parts on other open source projects:
+This software may be reused and adapted by respecting the MIT License. This project is based in parts on other open source projects:
 
 [pysmplegui](https://pysimplegui.readthedocs.io/en/latest/) graphical interface tool
 
