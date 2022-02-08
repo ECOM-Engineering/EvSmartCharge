@@ -9,7 +9,6 @@ C_RENAULT_PASS = "XXX"
 C_RENAULT_VIN = "XXX"           # your car ID
 C_COUNTRY = "CH"
 
-
 # Weather constants
 C_WEATHER_URL = "https://api.openweathermap.org/data/2.5/forecast?q=XXX_TOWN,ch&&units=metric&APPID="
 C_WEATHER_API_KEY = "XXX"
