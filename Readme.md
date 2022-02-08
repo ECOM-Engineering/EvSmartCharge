@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A smart EV vehicle charging software solution using as much of free solar power as available.  It uses remainig solar power besides other higher priority power consumers like heatpumps and other household equipment.
+A smart EV vehicle charging software solution using as much of free solar power as available.  It uses remainig solar power besides other higher priority power consumers like heatpumps and other household equipment.  The system can operate autonomously and also manually as remote control.
 
 ## Preconditions
 
@@ -23,9 +23,9 @@ Layered software archictecture allows adapting to different configurations and e
 
 ## Functionality
 
-ECS-1 is a Phyton software running on different systems including Raspberry-Pi computers. 
+ECS-1 is a Python software running on different systems including Raspberry-Pi computers. 
 
-## Open Source Thanks
+## Open Source
 
 This software may be reused and adapted under respecting the MIT License. It is based in parts on other open source projects:
 
@@ -36,5 +36,3 @@ This software may be reused and adapted under respecting the MIT License. It is 
 [SolarEdge API](https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf)
 
 [zozo](https://github.com/niosega/zozo) Renault ZOE server access library
-
-
