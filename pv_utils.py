@@ -3,10 +3,10 @@ import const
 import access
 
 # todo: PV power must remain for x minutes before decision
-# todo: use minimum charge time / pause time
-# todo: set charger aws only once
+# OK todo: use minimum charge time / pause time
+# OK todo: set charger aws only once
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
-# todo: Override local  decisions with remote control
+# OK todo: Override local  decisions with remote control
 
 C_ = {}
 SIMULATE_PV_TO_GRID = 0
@@ -16,25 +16,32 @@ SIMULATE_PV_TO_GRID = 0
 # todo: newcurrent nur setzen. wenn änderung gegenüber istzustand ??
 
 class SysData:  # kind of C structure
+    """All data used for signal processing and display."""
+
     carPlugged = False
-    batteryLevel = 0  # %
-    solarPower = 0  # kw
-    pvToGrid = 0  # kW
-    chargePower = 0  # W
-    currentL1 = 0  # A
-    voltageL1 = 0
-    chargeActive = False
+    batteryLevel = 0  # % from Renault server car API
+    solarPower = 0  # kw from Solar Inverter Cloud
+    pvToGrid = 0  # kW from Solar Inverter Cloud
+    chargePower = 0  # W  from go-eCharger Wallbox
+    currentL1 = 0  # A  from go-eCharger Wallbox
+    voltageL1 = 0  # V  from go-eCharger Wallbox
+    chargeActive = False  # from go-eCharger
     measuredPhases = 0  # 1 | 3 number of measuredPhases
     actPhases = "0"  # actual charger psm setting (C_CHARGER_x_PHASE)
     reqPhases = "0"  # requested phase by user or PV situation
     calcPvCurrent_1P = 0  # calculated 1 phase current, limited to max. setting
     calcPvCurrent_3P = 0  # calculated 3 phase current, if pvToGrid > minimum 3 phase current
-    pvHoldTimer = 'none'
-    phaseHoldTimer = 'none'
-    carState = "?"
+    pvHoldTimer = 'none'  # timer object
+    phaseHoldTimer = 'none'  # timer object
+    carState = "Vehicle Unplugged"
 
 
 def ecGetChargerData(sysData):
+    """
+    Converts charger data into sysData format
+    :param sysData: data record similar to C structure
+    :return: True, if car is plugged
+    """
     chargerData = access.ecReadChargerData()
     print('Charger Data:', chargerData)
     sysData.carPlugged = False
@@ -51,29 +58,21 @@ def ecGetChargerData(sysData):
             sysData.measuredPhases = 1
 
         sysData.actPhases = str(chargerData['psm'])
-        sysData.chargeActive = chargerData['frc'] == 2
+        sysData.chargeActive = chargerData['frc'] == 2  # True whilecharging
         sysData.carState = const.C_CHARGER_STATUS_TEXT[int(chargerData['car'])]
 
     return sysData.carPlugged
 
 
-def calcChargeCurrentOld(sysData):
-    """ Calculate optimal charge current depending on solar power. """
-
-    solarChargeCurrent = 0
-    # V1    actualPower = (chargerData['nrg'][11]) / 100
-    actualPower = sysData.chargePower / 1000  # convert to kW
-    newPower = actualPower + sysData.pvToGrid - const.C_PV_MIN_REMAIN  # calculation in kW
-    if sysData.voltageL1 > 0:
-        solarChargeCurrent = newPower * 1000 / sysData.voltageL1
-    if solarChargeCurrent > const.C_CHARGER_MAX_CURRENT:
-        solarChargeCurrent = const.C_CHARGER_MAX_CURRENT
-
-    return int(solarChargeCurrent)
-
-
 def calcChargeCurrent(sysData, maxCurrent_1P, minCurrent_3P):
-    """ Calculate optimal charge current depending on solar power. """
+    """
+     Calculate optimal charge current depending on solar power
+
+    :param sysData:         data record similar to C structure
+    :param maxCurrent_1P:   [A] upper limit for 1 phase
+    :param minCurrent_3P:   [A] minimum used for switch overr to 3 phases
+    :return sysData:        updatad data record
+    """
 
     solarChargeCurrent = 0
     sysData.reqPhases = const.C_CHARGER_1_PHASE
@@ -100,17 +99,29 @@ def calcChargeCurrent(sysData, maxCurrent_1P, minCurrent_3P):
 
 
 class TimerError(Exception):
-    """A custom exception used to report errors in use of Timer class"""
+    """A custom exception used to report errors in use of Timer class."""
 
 
 class EcTimer:
+    """Precision counters based on time.perf_counter."""
+
     def __init__(self):
         self._start_time = None
 
+    # classic backcounting timer
     def set(self, timePeriod):
+        """
+        Set timer in seconds
+            :return: ---
+        """
         self._start_time = timePeriod + time.perf_counter()
 
     def read(self):
+        """
+        Read remaing time. Zero if time elapsed
+
+            :return:  remaining time
+        """
         if self._start_time is not None:
             remain = self._start_time - time.perf_counter()
             if remain < 0:
@@ -119,8 +130,13 @@ class EcTimer:
             remain = 0
         return remain
 
+    # more functions for time measurement
     def start(self):
-        """Start a new timer"""
+        """
+        Start up counter
+
+        :return: ---
+        """
         if self._start_time is not None:
             raise TimerError(f"Timer is running. Use .stop() to stop it")
 

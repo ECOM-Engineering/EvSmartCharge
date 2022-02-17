@@ -12,6 +12,7 @@ import popSettings
 
 SIMULATE_PV_TO_GRID = 0
 
+
 sg.SetOptions(button_element_size=(11, 1), auto_size_buttons=False, font=('Arial', 10))
 
 batLevelBar = sg.ProgressBar(100, orientation='h', size=(20, 14), key='-battBar-', bar_color=('spring green', 'grey'))
@@ -59,7 +60,7 @@ layout = [[sg.Column(col1)],
           ]
 
 # create window`
-window = sg.Window('ECOM ECS-1 Solar Charging Manager', layout)
+window = sg.Window('ECOM EVS-1 Smart Solar Charging', layout)
 batt_bar = window['-battBar-']
 solar_bar = window['-solarBar-']
 charge_bar = window['-chargeBar-']
@@ -97,11 +98,7 @@ exitApp = False
 batteryLevel = 0
 forceFlag = False
 
-# try:
-#     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
-# except:
-#     settings = sysSettings.defaultSettings
-#     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
+
 if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
 else:
@@ -246,7 +243,7 @@ while not exitApp:
         # read car data
         if (t1s % const.C_SYS_CAR_CLOCK) == 0:
             #            ExecImmediate = False
-            if sysData.carPlugged:
+            if True: # sysData.carPlugged:
                 print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
                 carData = access.ec_GetCarData()
                 print('Car data:', carData)
@@ -289,7 +286,7 @@ while not exitApp:
 
         elif chargeMode == ChargeModes.EXTERN:
             print('EXTERN CHARGE')
-            SetLED(window, '-LED_CHARGE-', 'blue')
+            SetLED(window, '-LED_CHARGE-', 'tomato')
 
         elif chargeMode == ChargeModes.IDLE:
             print('IDLE, waiting for event')
@@ -317,3 +314,4 @@ while not exitApp:
 
 # done with loop... need to destroy the window as it's still open
 window.close()
+

@@ -4,14 +4,8 @@ from datetime import timedelta, date, datetime, time
 import const
 from zozo import Zoe
 
-# todo: return full json, separate decoder routine,
-# todo: identical ecGet....() parameters, example see  ecGetChargerData
 # todo: implement reaction on timeout for all devices
 # todo: remove User Info (PW) from zoe.getPersonalInfo()
-resultDict = {'vehicle': {'batteryLevel': 0, 'batteryRemaining': 0, 'totalKm': 0},
-              'PV': {'pvActual': 0, 'pvRemaining': 0},
-              'Charger': {'amp': 0, 'stp': 0, 'pha': 0},
-              'Weather': {'clouds': 100, 'temperature': 100, 'sky': '--'}}
 
 
 # noinspection SpellCheckingInspection
@@ -38,7 +32,6 @@ def ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False):
 
     url = const.C_WEATHER_URL + const.C_WEATHER_API_KEY
     r = requests.get(url, timeout=10)
-#    r.raise_for_status()
     status_code = r.status_code
     if status_code == 200:
         jsondict = r.json()
@@ -63,7 +56,6 @@ def ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False):
     weatherForecast['clouds'] = clouds
     weatherForecast['temp'] = temperature
     weatherForecast['weather'] = description
-    #     return clouds, temp
     return weatherForecast
 
 
@@ -81,8 +73,6 @@ def ec_GetCarData():
         zoe.getPersonalInfo()
     # todo: ignore if error    pos = zoe.googleLocation()
         batt = zoe.batteryStatus()
-#        charge = zoe.chargingSettings()
-#        hvac = zoe.hvacStatus()
         cockpit = zoe.cockpit()
         carData['statusCode'] = batt['status_code']
         carData['batteryLevel'] = batt['data']['attributes']['batteryLevel']
@@ -160,13 +150,9 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=10):
         statusCode = r.status_code
         if statusCode == 200:
             jsondata = r.json()
-
-    #        print(jsondata['siteCurrentPowerFlow'])
             jsondata = jsondata['siteCurrentPowerFlow']
-    #        print(jsondata)
             pvData['pvPower'] = jsondata['PV']['currentPower']
             pvData['LoadPower'] = jsondata['LOAD']['currentPower']
-        #    pvData['GridToLoad'] = jsondata['GRID']['currentPower']
             pvData['PowerToGrid'] = pvData['pvPower'] - pvData['LoadPower']
     except:
         pvData['statusCode'] = "exception"
@@ -174,7 +160,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=10):
     print(pvData)
     return pvData
 
-# test only
+##### test only
 if __name__ == "__main__":
 
 #    ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False)

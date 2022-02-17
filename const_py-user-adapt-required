@@ -30,8 +30,8 @@ C_CHARGER_STATUS_TEXT = ("No Charger access", "No vehicle", "Charging", "Wait fo
 
 # C_CHARGER_START_CMD = "alw"    # 1: charge
 C_CHARGER_START_CMD = "frc"      # 2: force, 1:stop
-C_CHARGER_3_PHASES = "2"         # parameter psm
-C_CHARGER_1_PHASE = "1"          # parameter psm
+C_CHARGER_3_PHASES = "2"         # parameter psm value 3 phase
+C_CHARGER_1_PHASE = "1"          # parameter psm value 1 phase
 
 # PV constants
 C_SOLAR_URL = "https://monitoringapi.solaredge.com/site/XXX/currentPowerFlow.json?api_key=UBXKIEOBRR64GNOQ6G43M3BQBFSNES8H"
