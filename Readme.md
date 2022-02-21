@@ -1,4 +1,4 @@
-# EvSmartCharge 'ESC-1'
+# EV-SmartCharge 'EVS-1'
 
 **This file and project under construction**
 
@@ -23,7 +23,7 @@ Layered software archictecture allows adapting to different configurations and e
 
 ## Functionality
 
-ECS-1 is a Python software running on different systems including Raspberry-Pi computers.  
+EVS-1 is a Python software running on different systems including Raspberry-Pi computers.  
 
 ## Open Source
 
@@ -35,4 +35,4 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 [SolarEdge API](https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf)
 
-[zozo](https://github.com/niosega/zozo) Renault ZOE server access library
+[zozo](https://github.com/niosega/zozo) Renault ZOE server access library, modified

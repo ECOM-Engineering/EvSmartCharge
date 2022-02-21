@@ -1,6 +1,7 @@
 import time
 import const
 import access
+import timers
 
 # todo: PV power must remain for x minutes before decision
 # OK todo: use minimum charge time / pause time
@@ -31,9 +32,21 @@ class SysData:  # kind of C structure
     reqPhases = "0"  # requested phase by user or PV situation
     calcPvCurrent_1P = 0  # calculated 1 phase current, limited to max. setting
     calcPvCurrent_3P = 0  # calculated 3 phase current, if pvToGrid > minimum 3 phase current
-    pvHoldTimer = 'none'  # timer object
-    phaseHoldTimer = 'none'  # timer object
     carState = "Vehicle Unplugged"
+    pvHoldTimer = timers.EcTimer()
+    phaseHoldTimer = timers.EcTimer()
+
+
+class ChargeModes:  # kind of enum
+    """Constants defining system state."""
+    IDLE = 0
+    PV = 1
+    FORCED = 2
+    EXTERN = 3
+    STOPPED = 4
+    FORCE_REQUEST = 5
+
+
 
 
 def ecGetChargerData(sysData):
@@ -98,61 +111,104 @@ def calcChargeCurrent(sysData, maxCurrent_1P, minCurrent_3P):
     return sysData
 
 
-class TimerError(Exception):
-    """A custom exception used to report errors in use of Timer class."""
+def evalChargeMode(chargeMode, sysData, settings):
+    """ State machine depending on realtime data and user intervention
 
+    :param chargeMode:  enum like construct defined as class ChargeModes
+    :param sysData: C structure like record defined as class SysData
+    :param settings: dictionary from PV_Manager.json file
+    :return: processed charge mode
+    """
+    new_chargeMode = chargeMode
+    pvSettings = settings['pv']
+    manualSettings = settings['manual']
+    pvAllow3phases = pvSettings['3_phases']
 
-class EcTimer:
-    """Precision counters based on time.perf_counter."""
+    calcChargeCurrent(sysData,
+                               pvSettings['max_1_Ph_current'], pvSettings['min_3_Ph_current'])
+    freeSolarCurrent = sysData.calcPvCurrent_1P
+ #   print('CHARGE-MODE ACTUAL:', chargeMode, end='')
 
-    def __init__(self):
-        self._start_time = None
+    if chargeMode == ChargeModes.FORCE_REQUEST:
+        if sysData.batteryLevel < manualSettings['chargeLimit']:
+            if manualSettings['3_phases'] == True:
+                sysData.reqPhases = const.C_CHARGER_3_PHASES
+            else:
+                sysData.reqPhases = const.C_CHARGER_1_PHASE
 
-    # classic backcounting timer
-    def set(self, timePeriod):
-        """
-        Set timer in seconds
-            :return: ---
-        """
-        self._start_time = timePeriod + time.perf_counter()
+            if sysData.phaseHoldTimer.read() == 0:
+                access.ecSetChargerData("acs", "0")  # authenticate
 
-    def read(self):
-        """
-        Read remaing time. Zero if time elapsed
+                if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
+                    access.ecSetChargerData("psm", sysData.reqPhases)
+                    sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
-            :return:  remaining time
-        """
-        if self._start_time is not None:
-            remain = self._start_time - time.perf_counter()
-            if remain < 0:
-                remain = 0
+                access.ecSetChargerData("amp", str(manualSettings['currentSet']))
+                access.ecSetChargerData("frc", "2")  # ON
+                new_chargeMode = ChargeModes.FORCED
+            else:
+                print('Phase change request -> wait, hold time', sysData.phaseHoldTimer.read())
         else:
-            remain = 0
-        return remain
+            new_chargeMode = ChargeModes.IDLE
 
-    # more functions for time measurement
-    def start(self):
-        """
-        Start up counter
+    if chargeMode == ChargeModes.FORCED:
+        if sysData.batteryLevel >= manualSettings['chargeLimit']:
+            new_chargeMode = ChargeModes.IDLE
+            print('CHARGE OFF, manual limit reached')
+            access.ecSetChargerData("acs", "0", 5)  # authentication
+            access.ecSetChargerData("frc", "1", tout=10)  # OFF
+            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)
 
-        :return: ---
-        """
-        if self._start_time is not None:
-            raise TimerError(f"Timer is running. Use .stop() to stop it")
+    #    elif chargeMode == ChargeModes.STOPPED:
+    if chargeMode == ChargeModes.STOPPED:
+        new_chargeMode = ChargeModes.IDLE
+        print('CHARGE STOPPED by user')
+        access.ecSetChargerData("frc", "1", tout=10)  # OFF
+        access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
+        access.ecSetChargerData("acs", "1", 10)  # authentication required
 
-        self._start_time = time.perf_counter()
 
-    def elapsed(self):
-        if self._start_time is not None:
-            elapsed_time = time.perf_counter() - self._start_time
-            print(f"Elapsed time: {elapsed_time:0.4f} seconds")
-            return elapsed_time
+    #    elif chargeMode == ChargeModes.PV:
+    if chargeMode == ChargeModes.PV:
+        if freeSolarCurrent < const.C_CHARGER_MIN_CURRENT or sysData.batteryLevel >= pvSettings['chargeLimit']:
+            if sysData.pvHoldTimer.read() == 0:
+                new_chargeMode = ChargeModes.IDLE
+                print('Charge OFF')
+                access.ecSetChargerData("frc", "1", tout=10)  # OFF
+                access.ecSetChargerData("acs", "1", 5)  # authentication required
+                sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
+        else:
+            access.ecSetChargerData("amp", str(freeSolarCurrent))  # addpt to actual level and continue  PV
+#            print('Current 1P:', sysData.calcPvCurrent_1P, ' 3P: ', sysData.calcPvCurrent_3P, 'PhaseRequest',
+#                  sysData.reqPhases)
+            if sysData.phaseHoldTimer.read() == 0 and pvAllow3phases:
+                if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
+                    access.ecSetChargerData("psm", sysData.reqPhases)
+                    print('set new current:', sysData.reqPhases, 'A' )
+                    # SysData.actPhases = SysData.reqPhases  #should be done at read charger data
+                    sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 
-    def stop(self):
-        """Stop the timer, and report the elapsed time"""
-        if self._start_time is None:
-            raise TimerError(f"Timer is not running")
+    elif chargeMode == ChargeModes.EXTERN:
+        if sysData.chargePower < 1000:
+            new_chargeMode = ChargeModes.IDLE
+            print('External Charge OFF')
 
-        elapsed_time = time.perf_counter() - self._start_time
-        self._start_time = None
-        print(f"Elapsed time: {elapsed_time:0.4f} seconds")
+    #    elif chargeMode == ChargeModes.IDLE:
+    if chargeMode == ChargeModes.IDLE:
+        if freeSolarCurrent >= const.C_CHARGER_MIN_CURRENT and sysData.batteryLevel < pvSettings['chargeLimit']:
+            if sysData.pvHoldTimer.read() == 0:
+                sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
+                new_chargeMode = ChargeModes.PV
+                print('Charge ON. Current', int(freeSolarCurrent))
+                access.ecSetChargerData("acs", "0", tout=10)  # authenticate
+                access.ecSetChargerData("amp", str(int(freeSolarCurrent)))
+                access.ecSetChargerData("frc", "2", tout=10)  # ON
+
+        elif sysData.chargePower > 1000:
+            new_chargeMode = ChargeModes.EXTERN
+
+    if new_chargeMode != chargeMode:
+        print('NEW Mode:', new_chargeMode, 'OLD:', chargeMode)
+
+    return new_chargeMode
+

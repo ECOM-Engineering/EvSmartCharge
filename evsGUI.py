@@ -2,18 +2,20 @@ import PySimpleGUI as sg
 import const
 
 #todo replace limit text limit sign by graph
+#sg.theme('DarkBlue3')
+#sg.theme('SystemDefault')
+sg.theme_progress_bar_border_width(1)
 
 
 sg.SetOptions(button_element_size=(11, 1), auto_size_buttons=False, font=('Helvetica', 11))
 
-batLevelBar = sg.ProgressBar(100, orientation='h', size=(25, 14), key='-battBar-', bar_color=('spring green', 'grey'))
+batLevelBar = sg.ProgressBar(100, orientation='h', size=(25, 14), key='-battBar-', bar_color=('spring green', '#9898A0'))
 chargePwrBar = sg.ProgressBar(const.C_CHARGER_MAX_POWER, orientation='h', size=(25, 14),
-                              key='-chargeBar-', bar_color=('blue', 'grey'))
-solarPwrBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-solarBar-', bar_color=('yellow', 'grey'))
-solarPwr2GridBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-toGridBar-', bar_color=('yellow', 'grey'))
-#battLimit = sg.Slider(k='-CHARGE LIMIT-', default_value=80, range=(0, 100), orientation='h',
-#                   s=(32, 12), tick_interval=20, disable_number_display=True)
-
+                              key='-chargeBar-', bar_color=('#00BFFF', '#9898A0'))
+solarPwrBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-solarBar-', bar_color=('yellow', '#9898A0'))
+solarPwr2GridBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-toGridBar-', bar_color=('yellow', '#9898A0'))
+messageText = sg.Text('Initializing ...', key='-MESSAGE-', size=50, text_color='#FDFDFF',
+                      background_color ='#64778D', border_width=1)
 
 battDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-batt-')
 solarDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-solar-')
@@ -21,8 +23,6 @@ chargeDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-ch
 chargeCurrentDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-chargeCurr-')
 phasesDisp = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', key='-measuredPhases-')
 toGridDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-toGrid-')
-
-
 
 def LEDIndicator(key=None, radius=30):
     return sg.Graph(canvas_size=(radius, radius),
@@ -34,7 +34,8 @@ def LEDIndicator(key=None, radius=30):
 def SetLED(win, key, color):
     graph = win[key]
     graph.erase()
-    graph.draw_circle((0, 0), 15, fill_color=color, line_color='black')
+    graph.draw_circle((0, 0), 12, fill_color=color, line_color='black')
+
 
 #for test only
 limit_sign = '▲'
@@ -59,8 +60,10 @@ col1 =  [
         [sg.Frame(title='Solar Power',  size=(500,75), layout=[
         [solarPwrBar, solarDisp, sg.Text('kW', pad=0), sg.Text('PV total power')],
         [solarPwr2GridBar, toGridDisp, sg.Text('kW', pad=0), sg.Text('PV power to grid')]])],
-        [sg.Text("")]  # empty line
-        ]
+        [sg.Text("")],  # empty line
+        [sg.Frame(title='Messages', size=(500,50), layout=[
+        [messageText, sg.Stretch(), LEDIndicator('-LED_MSG-')]])]]
+#       [sg.Text('Initializing ...', key='-MESSAGE-', size=53, text_color ='grey10', background_color ='light grey')]])]]
 
 layout = [[sg.Column(col1)],
           [sg.Button('Force Charge', disabled=True), sg.Button('Stop Charge', disabled=True),
@@ -68,17 +71,10 @@ layout = [[sg.Column(col1)],
           ]
 
 # create window`
-window = sg.Window('ECOM EVS-1 Smart Solar Charging', layout)
-batt_bar = window['-battBar-']
-solar_bar = window['-solarBar-']
-charge_bar = window['-chargeBar-']
-toGrid_bar = window['-toGridBar-']
-win_color = window.BackgroundColor
-#battLimit.TroughColor = win_color
 
+window = sg.Window('ECOM EVS-1 Smart Solar Charging', layout)
 
 def testLayout():
-
     while 1:
         event, values = window.read(timeout=200)
         if event == 'Quit' or event == sg.WIN_CLOSED:
@@ -87,6 +83,7 @@ def testLayout():
         SetLED(window,'-LED_SOLAR-', 'grey')
         SetLED(window,'-LED_FORCED-', 'white')
         SetLED(window,'-LED_EXTERN-', 'grey')
+        SetLED(window,'-LED_MSG-', 'grey')
 
 if __name__ == "__main__":
     testLayout()
