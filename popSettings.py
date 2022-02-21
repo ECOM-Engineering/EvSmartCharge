@@ -63,9 +63,9 @@ def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE):
             done = True
             break
 
-        if ev2 == '-CHARGE LIMIT-':
-            if val2['-CHARGE LIMIT-'] < batteryLevel:
-                popWin['-CHARGE LIMIT-'].update(batteryLevel)
+#        if ev2 == '-CHARGE LIMIT-':  # prevent limit lower than actuaöl battery level
+#            if val2['-CHARGE LIMIT-'] < batteryLevel:
+#                popWin['-CHARGE LIMIT-'].update(batteryLevel)
             #    print(manualSettings)
 
         # noinspection PySimplifyBooleanCheck

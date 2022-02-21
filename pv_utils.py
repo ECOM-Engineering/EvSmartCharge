@@ -161,12 +161,14 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     #    elif chargeMode == ChargeModes.STOPPED:
     if chargeMode == ChargeModes.STOPPED:
-        new_chargeMode = ChargeModes.IDLE
-        print('CHARGE STOPPED by user')
-        access.ecSetChargerData("frc", "1", tout=10)  # OFF
-        access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
-        access.ecSetChargerData("acs", "1", 10)  # authentication required
-
+        if sysData.phaseHoldTimer.read() == 0:
+            new_chargeMode = ChargeModes.IDLE
+            print('CHARGE STOPPED by user')
+            access.ecSetChargerData("frc", "1", tout=10)  # OFF
+            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
+            access.ecSetChargerData("acs", "1", 10)  # authentication required
+        else:
+            print('phaseHoldTimer waiting:', sysData.phaseHoldTimer.read() )
 
     #    elif chargeMode == ChargeModes.PV:
     if chargeMode == ChargeModes.PV:
