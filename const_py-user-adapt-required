@@ -54,3 +54,5 @@ C_SYS_MIN_PHASE_HOLD_TIME = 60  # seconds
 
 C_DEFAULT_SETTINGS_FILE = "./PV_Manager.json"
 
+#GUI COnstants
+C_BATT_COLORS = ["#BB0001", "#CD4700", "#DF8A03", "#748B01", "#00FF7F"]
