@@ -6,7 +6,6 @@ import const
 #sg.theme('SystemDefault')
 sg.theme_progress_bar_border_width(1)
 
-
 sg.SetOptions(button_element_size=(11, 1), auto_size_buttons=False, font=('Helvetica', 11))
 
 batLevelBar = sg.ProgressBar(100, orientation='h', size=(25, 14), key='-battBar-', bar_color=('spring green', '#9898A0'))

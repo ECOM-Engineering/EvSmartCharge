@@ -11,13 +11,13 @@ import popSettings
 
 window=evsGUI.window
 
-SIMULATE_PV_TO_GRID = False
+SIMULATE_PV_TO_GRID = 0
 
 ChargeModes = pv_utils.ChargeModes
 
 # create objects
 chargeMode = ChargeModes.IDLE  # default
-oldChargeMode = chargeMode  # used for detection of state transitions
+oldChargeMode = None  # used for detection of state transitions
 
 sysData = pv_utils.SysData
 #sysData.pvHoldTimer = pv_utils.EcTimer()
@@ -34,7 +34,9 @@ exitApp = False
 batteryLevel = 0
 limit_pos = ''
 limit = 0
+limit_scale = 67/100
 forceFlag = False
+firstRun = True
 
 
 if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
@@ -82,6 +84,15 @@ while not exitApp:
     # main time division for 1s base tick
     t100ms += 1
     if t100ms > 10:
+        if t1s == -1:  # first run
+            evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
+            evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
+            evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
+
+        if ExecImmediate == True:
+            t1s = -1
+            ExecImmediate = False
+
         t1s += 1
         t100ms = 0
         print('.', end='')
@@ -91,7 +102,7 @@ while not exitApp:
             evsGUI.SetLED(window, '-LED_MSG-', 'grey')
 
         # read charger data
-        if (t1s % const.C_SYS_CHARGER_CLOCK) == 0 or ExecImmediate == True:
+        if (t1s % const.C_SYS_CHARGER_CLOCK) == 0:
             window.finalize()
             printMsg('Reading charger data')
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
@@ -99,7 +110,7 @@ while not exitApp:
 #            ExecImmediate = False
 
         # read solar data
-        if (t1s % const.C_SYS_PV_CLOCK) == 0 or ExecImmediate == True:
+        if (t1s % const.C_SYS_PV_CLOCK) == 0:
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             window.finalize()
             printMsg('Reading photovoltaic data')
@@ -109,7 +120,7 @@ while not exitApp:
             sysData.solarPower = round(pvData['pvPower'], 1)
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
             if sysData.carPlugged:
-#                chargeMode = evalChargeMode(chargeMode, sysData, settings)
+                chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
                 ExecImmediate = False
 
         # read car data
@@ -133,75 +144,75 @@ while not exitApp:
                 ExecImmediate = True
             forceFlag = False
 
-        if sysData.carPlugged:
-            chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
+        # if sysData.carPlugged:
+        #     chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
 
     # ---------------------------------------- update display elements -------------------------------------------
-    if sysData.carPlugged: # and t1s == 1:  # first run
-        window['Force Charge'].update(disabled=False)
-        window['Stop Charge'].update(disabled=False)
-        limit = int(settings['pv']['chargeLimit'] * 67 / 100)
-        limit_pos = limit * ' ' + '▲'
+#    if sysData.carPlugged and t1s == 0:  # first run
+        if firstRun:
+            window['Force Charge'].update(disabled=False)
+            window['Stop Charge'].update(disabled=False)
+            firstRun = False
 
-    if chargeMode != oldChargeMode or ExecImmediate == True:
-        oldChargeMode = chargeMode
-        if chargeMode == ChargeModes.PV:
-            limit_pos = limit * ' ' +  '▲'
-            printMsg('Switching to SOLAR charge ...')
-            print('SOLAR CHARGE')
-            evsGUI.SetLED(window, '-LED_SOLAR-', 'yellow')
-            window['-chargeBar-'].update(bar_color= ('yellow','#9898A0'))
+        if chargeMode != oldChargeMode:
+            oldChargeMode = chargeMode
+            if chargeMode == ChargeModes.PV:
+                limit = int(settings['pv']['chargeLimit'])
+                limit_pos = int(limit_scale * limit) * ' ' + '▲'
 
-        elif chargeMode == ChargeModes.FORCED:
-            limit = int(settings['pv']['chargeLimit'] * 67 / 100)
-            limit_pos = limit * ' ' +  '▲'
-#            print('FORCED CHARGE')
-            printMsg('Switching to FORCED charg ...')
-            evsGUI.SetLED(window, '-LED_FORCED-', 'white')
-            window['-chargeBar-'].update(bar_color= ('white','#9898A0'))
+                printMsg('Switching to SOLAR charge ...')
+                print('SOLAR CHARGE')
+                evsGUI.SetLED(window, '-LED_SOLAR-', 'yellow')
+                window['-chargeBar-'].update(bar_color= ('yellow','#9898A0'))
 
-        elif chargeMode == ChargeModes.EXTERN:
-            limit_pos = ''
-            print('EXTERN CHARGE')
-            printMsg('EXTERNAL CHARGE was initiated')
-            evsGUI.SetLED(window, '-LED_EXTERN-', 'blue')
-            window['-chargeBar-'].update(bar_color= ('blue','#9898A0'))
+            elif chargeMode == ChargeModes.FORCED:
+                limit = int(settings['manual']['chargeLimit'])
+                limit_pos = int(limit_scale * limit) * ' ' + '▲'
+    #            print('FORCED CHARGE')
+                printMsg('Switching to FORCED charg ...')
+                evsGUI.SetLED(window, '-LED_FORCED-', 'white')
+                window['-chargeBar-'].update(bar_color= ('white','#9898A0'))
 
-        elif chargeMode == ChargeModes.IDLE:
-            limit = int(settings['manual']['chargeLimit'] * 67 / 100)
-            limit_pos = limit * ' ' + '▲'
-            print('IDLE, waiting for event')
-            evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
-            evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
-            evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
+            elif chargeMode == ChargeModes.EXTERN:
+                limit_pos = ''
+                print('EXTERN CHARGE')
+                printMsg('EXTERNAL CHARGE was initiated')
+                evsGUI.SetLED(window, '-LED_EXTERN-', 'blue')
+                window['-chargeBar-'].update(bar_color= ('blue','#9898A0'))
 
-    # display limit sign after first run
-    if (t1s > 0):
-        limit_pos = limit * ' ' + '▲'  # place limit sign
-
-    window['-battBar-'].update(current_count=sysData.batteryLevel)
-    window['-LIMIT_VAL-'].update(limit_pos)
-    window['-batt-'].update(sysData.batteryLevel)
-    window['-CHARGE_STATE-'].update(sysData.carState)
-
-    window['-solarBar-'].update(current_count=sysData.solarPower)
-    window['-solar-'].update(sysData.solarPower)
-
-    window['-chargeBar-'].update(current_count=int(sysData.chargePower / 1000))
-    window['-charge-'].update(sysData.chargePower / 1000)
-    window['-chargeCurr-'].update(sysData.currentL1)
-    window['-measuredPhases-'].update(sysData.measuredPhases)
-
-    window['-toGridBar-'].update(current_count=sysData.pvToGrid)
-    window['-toGrid-'].update(sysData.pvToGrid)
-
-    if t1s == 0: # place LEDs on first run
-        evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
-        evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
-        evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
+            elif chargeMode == ChargeModes.IDLE:
+                limit = int(settings['pv']['chargeLimit'])
+                limit_pos = int(limit_scale * limit) * ' ' + '▲'
+                print('IDLE, waiting for event')
+                evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
+                evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
+                evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
 
 
-    # if sysData.carPlugged:
+        if sysData.batteryLevel >= limit - 2:  # display as full / charge limit reached
+            batt_color = (const.C_BATT_COLORS[4],'#9898A0')
+        else:
+            batt_color = (const.C_BATT_COLORS[(sysData.batteryLevel//21)], '#9898A0')
+
+        window['-battBar-'].update(current_count=sysData.batteryLevel)
+        window['-battBar-'].update(bar_color = batt_color)
+
+        window['-LIMIT_VAL-'].update(limit_pos)
+        window['-batt-'].update(sysData.batteryLevel)
+        window['-CHARGE_STATE-'].update(sysData.carState)
+
+        window['-solarBar-'].update(current_count=sysData.solarPower)
+        window['-solar-'].update(sysData.solarPower)
+
+        window['-chargeBar-'].update(current_count=int(sysData.chargePower / 1000))
+        window['-charge-'].update(sysData.chargePower / 1000)
+        window['-chargeCurr-'].update(sysData.currentL1)
+        window['-measuredPhases-'].update(sysData.measuredPhases)
+
+        window['-toGridBar-'].update(current_count=sysData.pvToGrid)
+        window['-toGrid-'].update(sysData.pvToGrid)
+
+     # if sysData.carPlugged:
     #     evsGUI.SetLED(window, '-LED_BAT', 'spring green')
     # else:
     #     evsGUI.SetLED(window, '-LED_BAT', 'grey')
