@@ -1,6 +1,7 @@
 import evsGUI
 import time
 import os.path
+import configparser as CP
 
 import const
 import access
@@ -9,9 +10,12 @@ import sysSettings
 import popCharge
 import popSettings
 
-window=evsGUI.window
-
 SIMULATE_PV_TO_GRID = 0
+
+
+window = evsGUI.window
+window.finalize()
+window.move(100,100)
 
 ChargeModes = pv_utils.ChargeModes
 
@@ -38,7 +42,7 @@ limit_scale = 67/100
 forceFlag = False
 firstRun = True
 
-
+# use existing file or create one with default values
 if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
 else:
@@ -46,25 +50,25 @@ else:
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
 
 
-
-
 def printMsg(text=''):
     window['-MESSAGE-'].update(text)
-
 
 #sysData.phaseHoldTimer = pv_utils.EcTimer()
 #sysData.pvHoldTimer = pv_utils.EcTimer()
 # sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)  # prevent rapid phase switch
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
-while not exitApp:
+while  not exitApp:
     # cyclic check for user action
     event, values = window.read(timeout=100)
+#    if firstRun:
+#        window.move(500,100)
     if event == 'Quit' or window.was_closed():
         access.ecSetChargerData("frc", "1", 5)  # switch charging OFF
         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
         access.ecSetChargerData("acs", "1", 5)  # authentication required
         exitApp = True
+
     elif event == 'Force Charge':
         forceFlag = True
 
@@ -77,8 +81,7 @@ while not exitApp:
         done = popSettings.popSettings(batteryLevel=batteryLevel)
         if done:
             settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
-            limit = int(settings['pv']['chargeLimit'] * 67 / 100)
-
+            limit = settings['pv']['chargeLimit']
 
     # MAIN LOOP ------------------------------------------------------------------------------------------------------
     # main time division for 1s base tick
@@ -100,6 +103,18 @@ while not exitApp:
             evsGUI.SetLED(window, '-LED_MSG-', '#CCCCCC')
         else:
             evsGUI.SetLED(window, '-LED_MSG-', 'grey')
+
+        # read car data
+        if (t1s % const.C_SYS_CAR_CLOCK) == 0:
+            #            ExecImmediate = False
+            if True: # sysData.carPlugged:
+                print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
+                window.finalize()
+                printMsg('Reading car data')
+                carData = access.ec_GetCarData()
+                print('Car data:', carData)
+                batteryLevel = carData['batteryLevel']
+                sysData.batteryLevel = carData['batteryLevel']
 
         # read charger data
         if (t1s % const.C_SYS_CHARGER_CLOCK) == 0:
@@ -123,23 +138,12 @@ while not exitApp:
                 chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
                 ExecImmediate = False
 
-        # read car data
-        if (t1s % const.C_SYS_CAR_CLOCK) == 0:
-            #            ExecImmediate = False
-            if True: # sysData.carPlugged:
-                print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
-                window.finalize()
-                printMsg('Reading car data')
-                carData = access.ec_GetCarData()
-                print('Car data:', carData)
-                batteryLevel = carData['batteryLevel']
-                sysData.batteryLevel = carData['batteryLevel']
 
         if sysData.carPlugged and forceFlag == True:
             done = popCharge.popCharge(batteryLevel=batteryLevel)
             if done:
                 settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
-                limit = int(settings['manual']['chargeLimit'] * 67 / 100)
+                limit = int(settings['manual']['chargeLimit'])
                 chargeMode = ChargeModes.FORCE_REQUEST
                 ExecImmediate = True
             forceFlag = False
@@ -154,11 +158,14 @@ while not exitApp:
             window['Stop Charge'].update(disabled=False)
             firstRun = False
 
+        if limit > 0:
+            limit_pos = int(limit_scale * limit) * ' ' + '▲'
+
         if chargeMode != oldChargeMode:
             oldChargeMode = chargeMode
             if chargeMode == ChargeModes.PV:
                 limit = int(settings['pv']['chargeLimit'])
-                limit_pos = int(limit_scale * limit) * ' ' + '▲'
+#                limit_pos = int(limit_scale * limit) * ' ' + '▲'
 
                 printMsg('Switching to SOLAR charge ...')
                 print('SOLAR CHARGE')
@@ -174,7 +181,7 @@ while not exitApp:
                 window['-chargeBar-'].update(bar_color= ('white','#9898A0'))
 
             elif chargeMode == ChargeModes.EXTERN:
-                limit_pos = ''
+                limit = 0
                 print('EXTERN CHARGE')
                 printMsg('EXTERNAL CHARGE was initiated')
                 evsGUI.SetLED(window, '-LED_EXTERN-', 'blue')
@@ -218,5 +225,6 @@ while not exitApp:
     #     evsGUI.SetLED(window, '-LED_BAT', 'grey')
     #     evsGUI.SetLED(window, '-LED_CHARGE-', 'grey')
 
-# done with loop... need to destroy the window as it's still open
+
+
 window.close()

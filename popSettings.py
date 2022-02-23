@@ -74,11 +74,12 @@ def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE):
         else:
             popWin['-MIN_I_3_PH-'].update(disabled=True)
 
-    popWin.close()
-    settings['pv'] = pvSettings
-    sysSettings.writeSettings(file, settings)
-    return done
+    if done:
+        settings['pv'] = pvSettings
+        sysSettings.writeSettings(file, settings)
 
+    popWin.close()
+    return done
 
 if __name__ == "__main__":
     result = popSettings()
