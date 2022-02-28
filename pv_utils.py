@@ -1,4 +1,3 @@
-import time
 import const
 import access
 import timers
@@ -8,13 +7,9 @@ import timers
 # OK todo: set charger aws only once
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
 # OK todo: Override local  decisions with remote control
-
-C_ = {}
-
-
-
 # pvChargeOn = False
 # todo: newcurrent nur setzen. wenn änderung gegenüber istzustand ??
+
 
 class SysData:  # kind of C structure
     """All data used for signal processing and display."""
@@ -29,7 +24,7 @@ class SysData:  # kind of C structure
     chargeActive = False  # from go-eCharger
     measuredPhases = 0  # 1 | 3 number of measuredPhases
     actPhases = "0"  # actual charger psm setting (C_CHARGER_x_PHASE)
-    actCurrSet = 0  #actual charger setting
+    actCurrSet = 0  # actual charger setting
     reqPhases = "0"  # requested phase by user or PV situation
     calcPvCurrent_1P = 0  # calculated 1 phase current, limited to max. setting
     calcPvCurrent_3P = 0  # calculated 3 phase current, if pvToGrid > minimum 3 phase current
@@ -40,14 +35,13 @@ class SysData:  # kind of C structure
 
 class ChargeModes:  # kind of enum
     """Constants defining system state."""
-    IDLE = 0
-    PV = 1
-    FORCED = 2
-    EXTERN = 3
-    STOPPED = 4
-    FORCE_REQUEST = 5
-
-
+    UNPLUGGED = 0
+    IDLE = 1
+    PV = 2
+    FORCED = 3
+    EXTERN = 4
+    STOPPED = 5
+    FORCE_REQUEST = 6
 
 
 def ecGetChargerData(sysData):
@@ -59,7 +53,8 @@ def ecGetChargerData(sysData):
     chargerData = access.ecReadChargerData()
     print('Charger Data:', chargerData)
     sysData.carPlugged = False
-    if int(chargerData['car']) > 1:
+    sysData.chargePower = 0
+    if int(chargerData['car']) > 1: # car is plugged
         sysData.carPlugged = True
         # V1                SysData.chargePower = chargerData['nrg'][11] / 100  # original value is in 10W
         sysData.chargePower = chargerData['nrg'][11]  # original value
@@ -75,9 +70,10 @@ def ecGetChargerData(sysData):
         sysData.actCurrSet = chargerData['amp']
 
         sysData.chargeActive = chargerData['frc'] == 2  # True while charging
-        sysData.carState = const.C_CHARGER_STATUS_TEXT[int(chargerData['car'])]
 
-    return sysData.carPlugged
+    sysData.carState = const.C_CHARGER_STATUS_TEXT[int(chargerData['car'])]
+
+    return sysData
 
 
 def calcChargeCurrent(sysData, maxCurrent_1P, minCurrent_3P):
@@ -125,14 +121,21 @@ def evalChargeMode(chargeMode, sysData, settings):
     new_chargeMode = chargeMode
     pvSettings = settings['pv']
     manualSettings = settings['manual']
-    pvAllow3phases = pvSettings['3_phases']
+    pvAllow3phases = pvSettings['allow_3_phases']
 
     calcChargeCurrent(sysData, pvSettings['max_1_Ph_current'], pvSettings['min_3_Ph_current'])
- #   print('CHARGE-MODE ACTUAL:', chargeMode, end='')
+#   print('CHARGE-MODE ACTUAL:', chargeMode, end='')
+
+    if not sysData.carPlugged:
+        new_chargeMode = ChargeModes.UNPLUGGED
+
+    else:
+        if chargeMode == ChargeModes.UNPLUGGED:
+            new_chargeMode = ChargeModes.IDLE
 
     if chargeMode == ChargeModes.FORCE_REQUEST:
         if sysData.batteryLevel < manualSettings['chargeLimit']:
-            if manualSettings['3_phases'] == True:
+            if manualSettings['3_phases']:
                 sysData.reqPhases = const.C_CHARGER_3_PHASES
             else:
                 sysData.reqPhases = const.C_CHARGER_1_PHASE
@@ -169,7 +172,7 @@ def evalChargeMode(chargeMode, sysData, settings):
             access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
             access.ecSetChargerData("acs", "1", 10)  # authentication required
         else:
-            print('phaseHoldTimer waiting:', sysData.phaseHoldTimer.read() )
+            print('phaseHoldTimer waiting:', sysData.phaseHoldTimer.read())
 
     #    elif chargeMode == ChargeModes.PV:
     if chargeMode == ChargeModes.PV:
@@ -181,9 +184,9 @@ def evalChargeMode(chargeMode, sysData, settings):
         if freeSolarCurrent < const.C_CHARGER_MIN_CURRENT or sysData.batteryLevel >= pvSettings['chargeLimit']:
             if sysData.pvHoldTimer.read() == 0:
                 new_chargeMode = ChargeModes.IDLE
-                print('Charge OFF')
+                print('Solar charge OFF')
                 access.ecSetChargerData("frc", "1", tout=10)  # OFF
-                access.ecSetChargerData("acs", "1", 5)  # authentication required
+                access.ecSetChargerData("acs", "1", tout=10)  # authentication required
                 sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
         else:
             if freeSolarCurrent != sysData.actCurrSet:
@@ -210,7 +213,7 @@ def evalChargeMode(chargeMode, sysData, settings):
                 sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
                 new_chargeMode = ChargeModes.PV
                 print('Charge ON. Current', int(freeSolarCurrent))
-                access.ecSetChargerData("acs", "0", tout=10)  # authenticate
+                access.ecSetChargerData("acs", "0", tout=10)  # set to authenticate
                 access.ecSetChargerData("amp", str(int(freeSolarCurrent)))
                 access.ecSetChargerData("frc", "2", tout=10)  # ON
 
@@ -219,6 +222,10 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     if new_chargeMode != chargeMode:
         print('NEW Mode:', new_chargeMode, 'OLD:', chargeMode)
+        if new_chargeMode == ChargeModes.UNPLUGGED:
+            access.ecSetChargerData("frc", "1", tout=10)  # OFF
+            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
+            access.ecSetChargerData("acs", "1", 10)  # authentication required
 
     return new_chargeMode
 

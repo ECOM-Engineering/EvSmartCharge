@@ -160,7 +160,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=10):
     print(pvData)
     return pvData
 
-##### test only
+# --------  test only -----------
 if __name__ == "__main__":
 
 #    ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False)

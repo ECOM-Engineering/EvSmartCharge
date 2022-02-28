@@ -5,14 +5,18 @@ import const
 #sg.theme('DarkBlue3')
 #sg.theme('SystemDefault')
 sg.theme_progress_bar_border_width(1)
+barRelief = 'RELIEF_SUNKEN RELIEF'
 
 sg.SetOptions(button_element_size=(11, 1), auto_size_buttons=False, font=('Helvetica', 11))
 
-batLevelBar = sg.ProgressBar(100, orientation='h', size=(25, 14), key='-battBar-', bar_color=('spring green', '#9898A0'))
-chargePwrBar = sg.ProgressBar(const.C_CHARGER_MAX_POWER, orientation='h', size=(25, 14),
-                              key='-chargeBar-', bar_color=('#00BFFF', '#9898A0'))
-solarPwrBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-solarBar-', bar_color=('yellow', '#9898A0'))
-solarPwr2GridBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-toGridBar-', bar_color=('yellow', '#9898A0'))
+batLevelBar = sg.ProgressBar(100, orientation='h', size=(25, 14), key='-battBar-',
+                             relief=barRelief, bar_color=('spring green', '#9898A0'))
+chargePwrBar = sg.ProgressBar(const.C_CHARGER_MAX_POWER, orientation='h', size=(25, 14), key='-chargeBar-',
+                              relief=barRelief, bar_color=('#00BFFF', '#9898A0'))
+solarPwrBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-solarBar-',
+                             relief=barRelief, bar_color=('yellow', '#9898A0'))
+solarPwr2GridBar = sg.ProgressBar(6, orientation='h', size=(25, 14), key='-toGridBar-',
+                                  relief=barRelief, bar_color=('yellow', '#9898A0'))
 messageText = sg.Text('Initializing ...', key='-MESSAGE-', size=50, text_color='#FDFDFF',
                       background_color ='#64778D', border_width=1)
 
