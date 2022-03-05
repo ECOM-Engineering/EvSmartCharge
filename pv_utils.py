@@ -159,9 +159,9 @@ def evalChargeMode(chargeMode, sysData, settings):
         if sysData.batteryLevel >= manualSettings['chargeLimit']:
             new_chargeMode = ChargeModes.IDLE
             print('CHARGE OFF, manual limit reached')
-            access.ecSetChargerData("acs", "0", 5)  # authentication
-            access.ecSetChargerData("frc", "1", tout=10)  # OFF
-            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)
+            access.ecSetChargerData("acs", "0")  # authentication
+            access.ecSetChargerData("frc", "1")  # OFF
+            access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
 
     #    elif chargeMode == ChargeModes.STOPPED:
     if chargeMode == ChargeModes.STOPPED:

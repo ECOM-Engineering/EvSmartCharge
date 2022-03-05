@@ -97,7 +97,7 @@ def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=10):
     """
 
     # API V1 see: https://github.com/goecharger/go-eCharger-API-v1
-    # API V1 see: https://github.com/goecharger/go-eCharger-API-v2
+    # API V2 see: https://github.com/goecharger/go-eCharger-API-v2
     print('\nObtaining charger data ...')
 # v1    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx' : 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'err': -1}
     chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx': 0, 'frc': 0, 'nrg': 15 * [0], 'fsp': 'true', 'psm': 1, 'wh': 0, 'dwo': 0, 'err': -1}

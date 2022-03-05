@@ -4,8 +4,10 @@ import os.path
 import sysSettings
 import const
 
+sg.theme("SystemDefault")
+sg.set_options(button_color=('#000000','#cecece'), auto_size_buttons=False, button_element_size=(10,1))
 
-def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE):
+def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE, pop_location=(100,100)):
     """
     Function reads settings file and writes back if there are changes by the operator
 
@@ -46,7 +48,7 @@ def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE):
                    [sg.Button('Cancel', size=12), sg.Button('Store!', size=12, focus=True)]]
 
     # test global padding    popWin = sg.Window('Manual Charge Options',  layout_popC, element_padding=0)
-    popWin = sg.Window('PV Options', layout_popC)
+    popWin = sg.Window('PV Options', layout_popC, location=pop_location, modal=True)
     #    p = popWin['battLevel']
 
     while True:

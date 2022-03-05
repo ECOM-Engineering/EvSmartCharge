@@ -3,9 +3,10 @@ import os.path
 import const
 import sysSettings
 
-
+sg.theme("SystemDefaultForReal")
+sg.set_options(button_color=('#000000','#cecece'), auto_size_buttons=False, button_element_size=(10,1))
 # noinspection PySimplifyBooleanCheck
-def popCharge(batteryLevel=20, currentLimit=16, file=const.C_DEFAULT_SETTINGS_FILE):
+def popCharge(batteryLevel=20, currentLimit=16, file=const.C_DEFAULT_SETTINGS_FILE, pop_location = (200,200) ):
     """
     Function reads settings file and writes back if there are changes by the operator
 
@@ -45,7 +46,7 @@ def popCharge(batteryLevel=20, currentLimit=16, file=const.C_DEFAULT_SETTINGS_FI
                    [sg.Button('Cancel'), sg.Button('Charge!', focus=True)]]
 
     # test global padding    popWin = sg.Window('Manual Charge Options',  layout_popC, element_padding=0)
-    popWin = sg.Window('Manual Charge Options', layout_popC)
+    popWin = sg.Window('Manual Charge Options', layout_popC, location=pop_location, modal=True)
     #    if phaseSet == False:
     #        popWin['-3_PHASES-'].update(visible = False)
     #        sg.Radio.visible = False

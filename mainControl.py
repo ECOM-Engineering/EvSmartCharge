@@ -73,7 +73,7 @@ while not exitApp:
     if event == 'Quit' or window.was_closed():
         access.ecSetChargerData("frc", "1", 5)  # switch charging OFF
         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
-        access.ecSetChargerData("acs", "1", 5)  # authentication required
+        access.ecSetChargerData("acs", "1", 5)  # authentication required --> no automatic charge start at car plugging
         exitApp = True
 
     elif event == 'Force Charge':
@@ -85,7 +85,7 @@ while not exitApp:
             ExecImmediate = True
 
     elif event == 'PV-Settings':
-        done = popSettings.popSettings(batteryLevel=batteryLevel)
+        done = popSettings.popSettings(batteryLevel=batteryLevel, pop_location=window.current_location())
         if done:
             settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
             limit = settings['pv']['chargeLimit']
@@ -129,8 +129,8 @@ while not exitApp:
                 pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
             sysData.solarPower = round(pvData['pvPower'], 1)
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
-            #        if sysData.carPlugged:
-            if True:
+
+            if not firstRun:  # allow collecting all data
                 chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
                 ExecImmediate = False
 
@@ -150,7 +150,7 @@ while not exitApp:
                 sysData.batteryLevel = batteryLevel
 
         if sysData.carPlugged and forceFlag == True:
-            done = popCharge.popCharge(batteryLevel=batteryLevel)
+            done = popCharge.popCharge(batteryLevel=batteryLevel, pop_location=window.current_location())
             if done:
                 settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
                 limit = int(settings['manual']['chargeLimit'])
