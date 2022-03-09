@@ -27,6 +27,9 @@ else:
     win_location = window.current_location()
 x, y = win_location
 window.move(x, y)
+evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
+evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
+evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
 
 ChargeModes = pv_utils.ChargeModes
 
@@ -58,7 +61,6 @@ if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
 else:
     settings = sysSettings.defaultSettings
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
-
 
 def printMsg(text=''):
     window['-MESSAGE-'].update(text)
@@ -96,10 +98,8 @@ while not exitApp:
     # main time division for 1s base tick
     t100ms += 1
     if t100ms > 10:
-        if t1s == -1:  # first run
-            evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
-            evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
-            evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
+#        if t1s == -1:  # early display LEDs
+
 
         if ExecImmediate == True:
             t1s = -1
@@ -109,7 +109,10 @@ while not exitApp:
         t100ms = 0
         print('.', end='')
         if t1s % 2 == 0:  # blink life sign
-            evsGUI.SetLED(window, '-LED_MSG-', '#CCCCCC')
+             if chargeMode == ChargeModes.CAR_ERROR:
+                 evsGUI.SetLED(window, '-LED_MSG-', const.C_BLINK_ERROR_COLOR)
+             else:
+                evsGUI.SetLED(window, '-LED_MSG-', const.C_BLINK_OK_COLOR)
         else:
             evsGUI.SetLED(window, '-LED_MSG-', 'grey')
 
@@ -139,17 +142,23 @@ while not exitApp:
                 # todo: handle this in pv_utils.evalChargeMode()!!!
 
                 if sysData.batteryLevel < 0:  # todo reaction on multiple errors
-                    chargeMode = ChargeModes.CAR_ERROR
                     sysData.carErrorCounter += 1
                     printMsg('ERROR Reading Car Data, count ='  + str(sysData.carErrorCounter))
+                    print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
                     if sysData.carErrorCounter > const.C_MAX_CAR_CONNECTION_ERRORS:
                         printMsg('ERROR Reading Car Data, swithching OFF charger')
                         access.ecSetChargerData("frc", "1")  # switch charging OFF
                         access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
                         access.ecSetChargerData("acs", "1")  # authentication required --> no automatic charge start at car plugging
+                        chargeMode = ChargeModes.CAR_ERROR
                 else:
+                    if chargeMode == ChargeModes.CAR_ERROR:
+                        printMsg('RECOVERED Reading Car Data, count =' + str(sysData.carErrorCounter))
+                        print('RECOVERED Reading Car Data, count =', )
+                        chargeMode = ChargeModes.IDLE
+                        sysData.carErrorCounter = 0
+
                     chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
-                    sysData.carErrorCounter = 0
 
                     # read car data
         if (t1s % const.C_SYS_CAR_CLOCK) == 0:
@@ -174,14 +183,12 @@ while not exitApp:
                 ExecImmediate = True
             forceFlag = False
 
-        # if sysData.carPlugged:
-        #     chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
-
         # ---------------------------------------- update display elements -------------------------------------------
         #    if sysData.carPlugged and t1s == 0:  # first run
         if firstRun:
             window['Force Charge'].update(disabled=False)
             window['Stop Charge'].update(disabled=False)
+
             firstRun = False
 
         if limit > 0:
