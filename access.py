@@ -1,3 +1,4 @@
+from requests import ConnectionError
 import requests
 import json
 from datetime import timedelta, date, datetime, time
@@ -31,7 +32,7 @@ def ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False):
     timestamp = forecast_local.timestamp()
 
     url = const.C_WEATHER_URL + const.C_WEATHER_API_KEY
-    r = requests.get(url, timeout=10)
+    r = requests.get(url, timeout=20)
     status_code = r.status_code
     if status_code == 200:
         jsondict = r.json()
@@ -79,15 +80,21 @@ def ec_GetCarData():
         carData['plugStatus'] = batt['data']['attributes']['plugStatus']
 #        carData['clima'] = hvac['data']['attributes']['hvacStatus']
         carData['mileage'] = cockpit['data']['attributes']['totalMileage']
-    except:
+
+    except ConnectionError:
         carData['statusCode'] = -1
+        print('CONNECTION ERROR!')
+    except:
+        carData['statusCode']  = -2
+        print('JSON ERROR')
+
 #    carData['location'] = pos
 #    print('car Data:', carData)
     return carData
 
 
 # noinspection PyPep8
-def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=10):
+def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=15):
     """
     Get data from charger from WLAN or Cloud.
 
@@ -112,8 +119,13 @@ def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=10):
                     chargerData[key] = jsonData[key]
         else:
             chargerData['statusCode'] = statusCode
+
+    except ConnectionError:
+        chargerData['statusCode'] = -1
+        print('CONNECTION ERROR!')
     except:
-        chargerData['statusCode'] = 0
+        chargerData['statusCode'] = -2
+        print('JSON ERROR')
 
     return chargerData
 
@@ -130,11 +142,14 @@ def ecSetChargerData(param="amp", value="8", tout=10):
     """
     url = const.C_CHARGER_WIFI_URL + const.C_CHARGER_SET_PARAM + param + "=" + value
     print('\nSetting charger Data', url)
-    response = requests.get(url, timeout=tout)
+    try:
+        response = requests.get(url, timeout=tout)
+    except ConnectionError:
+        response = -1
     return response
 
 
-def ec_GetPVData(url=const.C_SOLAR_URL, tout=10):
+def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
     """
     Get relevant data from PV inverter.
 
@@ -154,7 +169,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=10):
             pvData['pvPower'] = jsondata['PV']['currentPower']
             pvData['LoadPower'] = jsondata['LOAD']['currentPower']
             pvData['PowerToGrid'] = pvData['pvPower'] - pvData['LoadPower']
-    except:
+    except ConnectionError:
         pvData['statusCode'] = "exception"
 
     print(pvData)

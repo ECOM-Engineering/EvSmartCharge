@@ -4,8 +4,9 @@ import json
 import os
 import const
 
-# 'FR' durch 'CH' ersetzt
-# File Operationen weggelassen
+
+# 'FR' replaced by 'CH' (Switzerland
+# File Operations partly removed
 
 # API Referemce  https://renault-api.readthedocs.io/en/latest/endpoints.html
 
@@ -69,12 +70,11 @@ class Zoe:
         self.gigyaCookieValue = json.loads(data)["sessionInfo"]["cookieValue"]
         self.gigyaPersonID = json.loads(data)["data"]["personId"]
 
-        # Save the result to a file, to avoid being annoyed by renault server quota limits.
         data = None
 #        data = self.loadFromFile("secondstep.dta")  # this request must be actual (from day to day ?)
         if data is None:
             url = self.gigyaURL + '/accounts.getJWT?oauth_token=' + self.gigyaCookieValue + '&login_token=' + self.gigyaCookieValue + '&expiration=' + "87000" + '&fields=data.personId,data.gigyaDataCenter&ApiKey=' + self.gigyaAPI
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=20)
             print("response step2", response)
             data = response.text
             self.saveToFile(data, "secondstep.dta")

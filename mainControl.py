@@ -10,6 +10,9 @@ import sysSettings
 import popCharge
 import popSettings
 
+# todo: reaction o missing car conection
+# todo: Car data connection error handling
+
 SIMULATE_PV_TO_GRID = 0
 
 # restore window position
@@ -43,7 +46,6 @@ pvData = None
 pvChargeOn = False
 chargeState = 0
 exitApp = False
-batteryLevel = 0
 limit_pos = ''
 limit = 0
 limit_scale = 67 / 100
@@ -85,7 +87,7 @@ while not exitApp:
             ExecImmediate = True
 
     elif event == 'PV-Settings':
-        done = popSettings.popSettings(batteryLevel=batteryLevel, pop_location=window.current_location())
+        done = popSettings.popSettings(batteryLevel=sysData.batteryLevel, pop_location=window.current_location())
         if done:
             settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
             limit = settings['pv']['chargeLimit']
@@ -130,11 +132,26 @@ while not exitApp:
             sysData.solarPower = round(pvData['pvPower'], 1)
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
 
-            if not firstRun:  # allow collecting all data
-                chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
+            if not firstRun:
                 ExecImmediate = False
 
-        # read car data
+                # Renault server is often down or produces bad or uncomplete json data
+                # todo: handle this in pv_utils.evalChargeMode()!!!
+
+                if sysData.batteryLevel < 0:  # todo reaction on multiple errors
+                    chargeMode = ChargeModes.CAR_ERROR
+                    sysData.carErrorCounter += 1
+                    printMsg('ERROR Reading Car Data, count ='  + str(sysData.carErrorCounter))
+                    if sysData.carErrorCounter > const.C_MAX_CAR_CONNECTION_ERRORS:
+                        printMsg('ERROR Reading Car Data, swithching OFF charger')
+                        access.ecSetChargerData("frc", "1")  # switch charging OFF
+                        access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
+                        access.ecSetChargerData("acs", "1")  # authentication required --> no automatic charge start at car plugging
+                else:
+                    chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
+                    sysData.carErrorCounter = 0
+
+                    # read car data
         if (t1s % const.C_SYS_CAR_CLOCK) == 0:
             #            ExecImmediate = False
             if sysData.carPlugged:
@@ -143,14 +160,13 @@ while not exitApp:
                 printMsg('Reading car data')
                 carData = access.ec_GetCarData()
                 print('Car data:', carData)
-                batteryLevel = carData['batteryLevel']
-                sysData.batteryLevel = batteryLevel
+                sysData.batteryLevel = carData['batteryLevel']
+
             else:
-                batteryLevel = 0
-                sysData.batteryLevel = batteryLevel
+                sysData.batteryLevel = 0
 
         if sysData.carPlugged and forceFlag == True:
-            done = popCharge.popCharge(batteryLevel=batteryLevel, pop_location=window.current_location())
+            done = popCharge.popCharge(batteryLevel=sysData.batteryLevel, pop_location=window.current_location())
             if done:
                 settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
                 limit = int(settings['manual']['chargeLimit'])
@@ -175,8 +191,6 @@ while not exitApp:
             oldChargeMode = chargeMode
             if chargeMode == ChargeModes.PV:
                 limit = int(settings['pv']['chargeLimit'])
-                #                limit_pos = int(limit_scale * limit) * ' ' + '▲'
-
                 printMsg('Switching to SOLAR charge ...')
                 print('SOLAR CHARGE')
                 evsGUI.SetLED(window, '-LED_SOLAR-', 'yellow')
