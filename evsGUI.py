@@ -78,6 +78,7 @@ layout = [[sg.Column(col1)],
 # create window`
 window = sg.Window('ECOM EVS-1 Smart Solar Charging', layout)
 
+
 def testLayout():
     while 1:
         event, values = window.read(timeout=200)

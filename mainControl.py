@@ -98,10 +98,7 @@ while not exitApp:
     # main time division for 1s base tick
     t100ms += 1
     if t100ms > 10:
-#        if t1s == -1:  # early display LEDs
-
-
-        if ExecImmediate == True:
+        if ExecImmediate == True:  # todo: check handling of ExecImmediate
             t1s = -1
             ExecImmediate = False
 
@@ -122,7 +119,6 @@ while not exitApp:
             printMsg('Reading charger data')
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             sysData = pv_utils.ecGetChargerData(sysData)
-        #            ExecImmediate = False
 
         # read solar data
         if (t1s % const.C_SYS_PV_CLOCK) == 0:
@@ -162,7 +158,6 @@ while not exitApp:
 
                     # read car data
         if (t1s % const.C_SYS_CAR_CLOCK) == 0:
-            #            ExecImmediate = False
             if sysData.carPlugged:
                 print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
                 window.finalize()

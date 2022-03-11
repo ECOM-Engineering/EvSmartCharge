@@ -128,10 +128,9 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     if not sysData.carPlugged:
         new_chargeMode = ChargeModes.UNPLUGGED
-    else:
+    else:  # car is plugged
         if chargeMode == ChargeModes.UNPLUGGED:
-            new_chargeMode = ChargeModes.IDLE
-
+            new_chargeMode = ChargeModes.IDLE  # recover processing
 
     if chargeMode == ChargeModes.FORCE_REQUEST:
         if sysData.batteryLevel < manualSettings['chargeLimit']:
