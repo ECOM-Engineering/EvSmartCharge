@@ -47,7 +47,7 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 ![](Images\MainScreen.png)
 
-### PV-Settings
+### PV Settings
 
 ![](Images\Popup_PV-Settings.png)
 
