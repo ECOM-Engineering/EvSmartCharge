@@ -29,8 +29,6 @@ EVS-1 is a Python software running on different systems including Windows, Linux
 
 EVS-1 uses surplus energy of photovoltaic installations. Depending on solar power and car type, the system adjusts optimal charging power and switches autonomously from 1 phaes to 3 phases.
 
-
-
 ## Open Source
 
 This software may be reused and adapted by respecting the MIT License. This project is based in parts on other open source projects:
@@ -43,24 +41,16 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 [zozo](https://github.com/niosega/zozo) Renault ZOE server access library, modified
 
-
-
 ## Preiliminary Screenshots
-
-
 
 ### Main Window
 
-![](C:\Users\klaus\AppData\Roaming\marktext\images\2022-03-05-11-49-21-image.png)
-
-
+![](Images\MainScreen.png)
 
 ### PV-Settings
 
-![](C:\Users\klaus\AppData\Roaming\marktext\images\2022-03-05-11-50-38-image.png)
-
-
+![](Images\Popup_PV-Settings.png)
 
 ### Manual Charge Settings
 
-![](C:\Users\klaus\AppData\Roaming\marktext\images\2022-03-05-11-51-21-image.png)
+![](Images/Popup_ManualSettings.png)
