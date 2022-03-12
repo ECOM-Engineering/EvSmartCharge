@@ -45,11 +45,11 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 ### Main Window
 
-![](Images\MainScreen.png)
+![](Images/MainScreen.png)
 
 ### PV Settings
 
-![](Images\Popup_PV-Settings.png)
+![](Images/Popup_PV-Settings.png)
 
 ### Manual Charge Settings
 
