@@ -46,7 +46,7 @@ def popCharge(batteryLevel=20, currentLimit=16, file=const.C_DEFAULT_SETTINGS_FI
                    [sg.Button('Cancel'), sg.Button('Charge!', focus=True)]]
 
     # test global padding    popWin = sg.Window('Manual Charge Options',  layout_popC, element_padding=0)
-    popWin = sg.Window('Manual Charge Options', layout_popC, location=pop_location, modal=True)
+    popWin = sg.Window('Manual Charge Options', layout_popC, location=pop_location, modal=True, icon=const.C_LOGO)
     #    if phaseSet == False:
     #        popWin['-3_PHASES-'].update(visible = False)
     #        sg.Radio.visible = False

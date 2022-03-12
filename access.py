@@ -5,7 +5,6 @@ from datetime import timedelta, date, datetime, time
 import const
 from zozo import Zoe
 
-# todo: implement reaction on timeout for all devices
 # todo: remove User Info (PW) from zoe.getPersonalInfo()
 
 
@@ -131,7 +130,7 @@ def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=15):
 
 
 # noinspection SpellCheckingInspection
-def ecSetChargerData(param="amp", value="8", tout=10):
+def ecSetChargerData(param="amp", value="8", tout=15):
     """
     Set a single parameter of the charger
 

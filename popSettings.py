@@ -48,7 +48,7 @@ def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE, pop_locatio
                    [sg.Button('Cancel', size=12), sg.Button('Store!', size=12, focus=True)]]
 
     # test global padding    popWin = sg.Window('Manual Charge Options',  layout_popC, element_padding=0)
-    popWin = sg.Window('PV Options', layout_popC, location=pop_location, modal=True)
+    popWin = sg.Window('PV Options', layout_popC, location=pop_location, modal=True, icon=const.C_LOGO)
     #    p = popWin['battLevel']
 
     while True:

@@ -8,7 +8,6 @@ import timers
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
 # OK todo: Override local  decisions with remote control
 # pvChargeOn = False
-# todo: newcurrent nur setzen. wenn änderung gegenüber istzustand ??
 
 
 class SysData:  # kind of C structure
@@ -45,7 +44,9 @@ class ChargeModes:  # kind of enum
     CAR_ERROR = 7  # todo if car data read error suspend charging
 
 
+#    def ecGetChargerData(sysData):
 def ecGetChargerData(sysData):
+
     """
     Converts charger data into sysData format
     :param sysData: data record similar to C structure
