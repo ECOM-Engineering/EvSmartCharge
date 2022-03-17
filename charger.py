@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-
 import time
 from json import JSONDecodeError
-from requests import ConnectionError
 import requests
-
+from requests import ConnectionError
 
 # API V1 see: https://github.com/goecharger/go-eCharger-API-v1
 # API V2 see: https://github.com/goecharger/go-eCharger-API-v2
+import const
+
 
 class Charger:
     url = ''
@@ -21,14 +21,12 @@ class Charger:
         :param api_version: API version (series CM-02: 1, series CM-03: 2)
         :param timeout:     optional seconds. Default = 15
         """
-
         if url is None or url == '':
             raise ValueError("Please set charger url")
 
         self.url = url
         self.api_version = api_version
         self.timeout = timeout
-
         if self.api_version == 2:
             self.chargerData = {'car': 0, 'amp': 0, 'frc': 0, 'nrg': 15 * [0], 'fsp': 'true', 'psm': 1,
                                 'wh': 0, 'dwo': 0, 'acs': 0, 'err': -1}
@@ -56,7 +54,8 @@ class Charger:
             if statusCode == 200:
                 jsonData = response.json()
                 for key in self.chargerData:
-                    self.chargerData[key] = jsonData[key]
+                    if key in jsonData:
+                        self.chargerData[key] = jsonData[key]
             else:
                 self.chargerData['statusCode'] = statusCode
 
@@ -79,21 +78,17 @@ class Charger:
         :param value: integer: value to be set
         :return: dictionary . On communication error: -1 or html status
         """
-
         value = str(value)
         if self.api_version == 2:
-            command = self.url + '/api/status?' + param + "=" + value
+            command = self.url + '/api/set?' + param + "=" + value
         else:
             command = self.url + '/mqtt?payload=' + param + "=" + value
-
         print('\nSetting charger Data', command)
         try:
             response = requests.get(command, timeout=self.timeout)
             status_code = response.status_code
-
         except ConnectionError:
             status_code = -1
-
         return status_code
 
     def start_charging(self):
@@ -102,14 +97,15 @@ class Charger:
 
         :return: html status, 200 is OK
         """
-
         if self.api_version == 1:
             status_code = self.__set_charger_param('alw', 1)
+            if status_code == 200:
+                status_code = self.__set_charger_param('ast', 0)
+
         else:
             status_code = self.__set_charger_param('acs', 0)  # authenticate
             if status_code == 200:
-               status_code = self.__set_charger_param('frc', 2)  # start charger
-
+                status_code = self.__set_charger_param('frc', 2)  # start charger
         return status_code
 
     def stop_charging(self, authenticate=1):
@@ -120,12 +116,13 @@ class Charger:
         """
         if self.api_version == 1:
             status_code = self.__set_charger_param('alw', 0)
+            if status_code == 200:
+                status_code = self.__set_charger_param('ast', authenticate)
         else:
             status_code = self.__set_charger_param('frc', 1)
             if status_code == 200:
-               status_code = self.__set_charger_param('acs',
-                                                  authenticate)  # authenticate in order to prevent automatic start
-
+                # authenticate in order to prevent automatic start
+                status_code = self.__set_charger_param('acs', authenticate)
         return status_code
 
     def set_current(self, current):
@@ -139,7 +136,6 @@ class Charger:
             param = 'amx'
         else:
             param = 'amp'
-
         status_code = self.__set_charger_param(param, current)
         return status_code
 
@@ -149,32 +145,29 @@ class Charger:
         :param phase: value 1 or 3. Only valid for API version 2 (charger series CM-03)
         :return:  html status, 200 is OK, -1 if command not recognized
         """
-
         if self.api_version == 1:
             status_code = -1
             print("phase command not supported in go-e charger CM01 and CM02")
-
         else:
             if phase == 1:
-                value = 1
+                value = const.C_CHARGER_1_PHASE
             else:
-                value = 2
+                value = const.C_CHARGER_3_PHASES
             status_code = self.__set_charger_param('psm', value)
-
         return status_code
 
 
 # test
 if __name__ == "__main__":
     go = Charger("http://192.168.0.30", 2)
-#    go = Charger("http://192.168.0.11", 1)
+    #    go = Charger("http://192.168.0.11", 1)
 
     # go = Charger(const.C_CHARGER_WIFI_URL, 2)
 
-    status= go.set_current(8)
+    status = go.set_current(7)
     print('set_current() status =', status)
 
-    status= go.get_charger_data()
+    status = go.get_charger_data()
     print('ecReadChargerData() status =', status)
 
     status = go.set_phase(1)
@@ -183,9 +176,12 @@ if __name__ == "__main__":
     status = go.start_charging()
     print('START status =', status)
 
-    wait = 5
+    wait = 20
     print('SLEEPING ... ', wait)
     time.sleep(wait)
+
+    status = go.get_charger_data()
+    print('ecReadChargerData() status =', status)
 
     status = go.stop_charging()
     print('STROP status =', status)

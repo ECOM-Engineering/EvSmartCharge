@@ -10,8 +10,6 @@ import sysSettings
 import popCharge
 import popSettings
 
-# todo: reaction o missing car conection
-# todo: Car data connection error handling
 
 SIMULATE_PV_TO_GRID = 0
 
@@ -36,10 +34,9 @@ ChargeModes = pv_utils.ChargeModes
 # create objects
 chargeMode = ChargeModes.IDLE  # default
 oldChargeMode = None  # used for detection of state transitions
-
 sysData = pv_utils.SysData
-# sysData.pvHoldTimer = pv_utils.EcTimer()
-# sysData.phaseHoldTimer = pv_utils.EcTimer()
+go_e = pv_utils.charge
+
 
 # initial of module global variables
 t100ms = 0
@@ -66,18 +63,12 @@ def printMsg(text=''):
     window['-MESSAGE-'].update(text)
 
 
-# sysData.phaseHoldTimer = pv_utils.EcTimer()
-# sysData.pvHoldTimer = pv_utils.EcTimer()
-# sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)  # prevent rapid phase switch
-
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
     # cyclic check for user action
     event, values = window.read(timeout=100)
     if event == 'Quit' or window.was_closed():
-        access.ecSetChargerData("frc", "1", 5)  # switch charging OFF
-        access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
-        access.ecSetChargerData("acs", "1", 5)  # authentication required --> no automatic charge start at car plugging
+        go_e.stop_charging()
         exitApp = True
 
     elif event == 'Force Charge':
@@ -118,7 +109,7 @@ while not exitApp:
             #            window.finalize()
             printMsg('Reading charger data')
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
-            sysData = pv_utils.ecGetChargerData(sysData)
+            sysData = pv_utils.processChargerData(sysData)
 
         # read solar data
         if (t1s % const.C_SYS_PV_CLOCK) == 0:
@@ -143,9 +134,7 @@ while not exitApp:
                     print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
                     if sysData.carErrorCounter > const.C_MAX_CAR_CONNECTION_ERRORS:
                         printMsg('ERROR Reading Car Data, swithching OFF charger')
-                        access.ecSetChargerData("frc", "1")  # switch charging OFF
-                        access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE)
-                        access.ecSetChargerData("acs", "1")  # authentication required --> no automatic charge start at car plugging
+                        go_e.stop_charging()
                         chargeMode = ChargeModes.CAR_ERROR
                 else:
                     if chargeMode == ChargeModes.CAR_ERROR:
@@ -236,19 +225,14 @@ while not exitApp:
         window['-solarBar-'].update(current_count=sysData.solarPower)
         window['-solar-'].update(sysData.solarPower)
 
-        window['-chargeBar-'].update(current_count=int(sysData.chargePower / 1000))
-        window['-charge-'].update(sysData.chargePower / 1000)
+        window['-chargeBar-'].update(current_count=int(sysData.chargePower))
+        window['-charge-'].update(sysData.chargePower)
         window['-chargeCurr-'].update(sysData.currentL1)
         window['-measuredPhases-'].update(sysData.measuredPhases)
 
         window['-toGridBar-'].update(current_count=sysData.pvToGrid)
         window['-toGrid-'].update(sysData.pvToGrid)
 
-    # if sysData.carPlugged:
-    #     evsGUI.SetLED(window, '-LED_BAT', 'spring green')
-    # else:
-    #     evsGUI.SetLED(window, '-LED_BAT', 'grey')
-    #     evsGUI.SetLED(window, '-LED_CHARGE-', 'grey')
 
 if (event != window.was_closed()):
     win_location = window.current_location()
