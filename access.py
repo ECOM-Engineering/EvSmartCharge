@@ -93,59 +93,6 @@ def ec_GetCarData():
 
 
 # noinspection PyPep8
-def ecReadChargerData(url=const.C_CHARGER_WIFI_URL, tout=15):
-    """
-    Get data from charger from WLAN or Cloud.
-
-    :param url: url to the charger including API keys
-    :param tout: timeout [default 5s]
-    :return: dictionary containing relevant charger data
-    """
-
-    # API V1 see: https://github.com/goecharger/go-eCharger-API-v1
-    # API V2 see: https://github.com/goecharger/go-eCharger-API-v2
-    print('\nObtaining charger data ...')
-# v1    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx' : 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'err': -1}
-    chargerData = {'statusCode': 0, 'car': 0, 'amp': 0, 'amx': 0, 'frc': 0, 'nrg': 15 * [0], 'fsp': 'true', 'psm': 1, 'wh': 0, 'dwo': 0, 'err': -1}
-    try:
-        response = requests.get(url + const.C_CHARGER_GET_STATUS, timeout=tout)
-        statusCode = response.status_code
-        chargerData['statusCode'] = statusCode
-        if statusCode == 200:
-            jsonData = response.json()
-            for key in chargerData:
-                if key != 'statusCode' and key != 'amx':  # key is not in jsonData
-                    chargerData[key] = jsonData[key]
-        else:
-            chargerData['statusCode'] = statusCode
-
-    except ConnectionError:
-        chargerData['statusCode'] = -1
-        print('CONNECTION ERROR!')
-    except:
-        chargerData['statusCode'] = -2
-        print('JSON ERROR')
-
-    return chargerData
-
-
-# noinspection SpellCheckingInspection
-def ecSetChargerData(param="amp", value="8", tout=15):
-    """
-    Set a single parameter of the charger
-
-    :param param: charger parameter to be set
-    :param value: value to be set, always as string!
-    :param tout: timeout in seconds
-    :return: dictionary or error message, if param out of range
-    """
-    url = const.C_CHARGER_WIFI_URL + const.C_CHARGER_SET_PARAM + param + "=" + value
-    print('\nSetting charger Data', url)
-    try:
-        response = requests.get(url, timeout=tout)
-    except ConnectionError:
-        response = -1
-    return response
 
 
 def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
@@ -178,10 +125,10 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
 if __name__ == "__main__":
 
 #    ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False)
-#    ec_GetCarData()
-    print("API Version =", const.C_CHARGER_API_VERSION)
-    ecReadChargerData()
-    ecSetChargerData("amp", "8")
+     ec_GetCarData()
+    # print("API Version =", const.C_CHARGER_API_VERSION)
+    # ecReadChargerData()
+    # ecSetChargerData("amp", "8")
 
 #    ecSetChargerData("alw", "0")  # 1 : start charging
 #    ec_GetPVData()
