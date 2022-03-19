@@ -1,7 +1,6 @@
 import requests
 import urllib.parse
 import json
-import os
 import const
 
 
@@ -24,7 +23,7 @@ class Zoe:
         self.kamareonURL = const.C_KAMERON_URL
         self.kamareonAPI = const.C_KAMERON_API
         self.vin = const.C_RENAULT_VIN
-        self.country = const.C_COUNTRY
+        self.country = const.C_RENAULT_COUNTRY
 
     def getStatus(self, endpoint, version = "2"):
         url = self.kamareonURL + '/commerce/v1/accounts/' + self.account_id + '/kamereon/kca/car-adapter/v' + version + '/cars/' + self.VIN + '/' + endpoint + '?country=' + self.country
@@ -86,7 +85,7 @@ class Zoe:
         if data is None:
             url = self.kamareonURL + '/commerce/v1/persons/' + self.gigyaPersonID + '?country=CH'
             headers = {"x-gigya-id_token": self.gigyaJWTToken, "apikey": self.kamareonAPI}
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(url, headers=headers, timeout=10) # error happens here
             print("response step3", response)
             data = response.text
             self.saveToFile(data, "thirdstep.dta")
