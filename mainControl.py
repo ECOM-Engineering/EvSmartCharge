@@ -21,7 +21,7 @@ config.read(const.C_INI_FILE)
 if (config.has_option('Window', 'position_xy')):
     win_location = config['Window']['position_xy']
     win_location = eval(win_location)  # re-format to tuple(x,y)
-else:
+else:  # last location will be stored at exit
     win_location = window.current_location()
 x, y = win_location
 window.move(x, y)
@@ -119,8 +119,12 @@ while not exitApp:
             pvData = access.ec_GetPVData(tout=20)
             if SIMULATE_PV_TO_GRID > 0:
                 pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
-            sysData.solarPower = round(pvData['pvPower'], 1)
-            sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
+            if pvData['statusCode'] == 200:
+                sysData.solarPower = round(pvData['pvPower'], 1)
+                sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
+            else:
+                printMsg('Error reading PV data, status:' + str(pvData['statusCode']))
+                sysData.pvToGrid = 0
 
             if not firstRun:
                 ExecImmediate = False

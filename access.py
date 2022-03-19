@@ -7,7 +7,6 @@ from zozo import Zoe
 
 # todo: remove User Info (PW) from zoe.getPersonalInfo()
 
-
 # noinspection SpellCheckingInspection
 def ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False):
     """
@@ -109,6 +108,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
         r = requests.get(url, tout)
         pvData['statusCode'] = r.status_code
         statusCode = r.status_code
+        pvData['statusCode'] = statusCode
         if statusCode == 200:
             jsondata = r.json()
             jsondata = jsondata['siteCurrentPowerFlow']
@@ -116,7 +116,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
             pvData['LoadPower'] = jsondata['LOAD']['currentPower']
             pvData['PowerToGrid'] = pvData['pvPower'] - pvData['LoadPower']
     except ConnectionError:
-        pvData['statusCode'] = "exception"
+        pvData['statusCode'] = "-1"
 
     print(pvData)
     return pvData
