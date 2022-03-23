@@ -25,6 +25,7 @@ else:  # last location will be stored at exit
     win_location = window.current_location()
 x, y = win_location
 window.move(x, y)
+
 evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
 evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
 evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
@@ -106,16 +107,13 @@ while not exitApp:
 
         # read charger data
         if (t1s % const.C_SYS_CHARGER_CLOCK) == 0:
-            #            window.finalize()
-            printMsg('Reading charger data')
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             sysData = pv_utils.processChargerData(sysData)
+            print('Processing charger data')
 
         # read solar data
         if (t1s % const.C_SYS_PV_CLOCK) == 0:
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
-            printMsg('Reading photovoltaic data')
-            #            window.finalize()
             pvData = access.ec_GetPVData(tout=20)
             if SIMULATE_PV_TO_GRID > 0:
                 pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
@@ -154,7 +152,6 @@ while not exitApp:
             if sysData.carPlugged:
                 print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
                 window.finalize()
-                printMsg('Reading car data')
                 carData = access.ec_GetCarData()
                 print('Car data:', carData)
                 sysData.batteryLevel = carData['batteryLevel']
@@ -176,6 +173,7 @@ while not exitApp:
         if firstRun:
             window['Force Charge'].update(disabled=False)
             window['Stop Charge'].update(disabled=False)
+            printMsg("IDLE, waiting for event ...")
 
             firstRun = False
 
@@ -195,7 +193,7 @@ while not exitApp:
                 limit = int(settings['manual']['chargeLimit'])
                 limit_pos = int(limit_scale * limit) * ' ' + '▲'
                 #            print('FORCED CHARGE')
-                printMsg('Switching to FORCED charg ...')
+                printMsg('Switching to FORCED charge ...')
                 evsGUI.SetLED(window, '-LED_FORCED-', 'white')
                 window['-chargeBar-'].update(bar_color=('white', '#9898A0'))
 
@@ -209,7 +207,7 @@ while not exitApp:
             elif chargeMode == ChargeModes.IDLE or chargeMode == ChargeModes.UNPLUGGED:
                 limit = int(settings['pv']['chargeLimit'])
                 limit_pos = int(limit_scale * limit) * ' ' + '▲'
-                print('IDLE, waiting for event')
+                print('IDLE, waiting for event ...')
                 evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
                 evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
                 evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')

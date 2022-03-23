@@ -1,6 +1,12 @@
+import io
 import const
 import timers
 import charger
+import evsGUI
+
+# window = evsGUI.window
+# def printMsg(text=''):
+#     window['-MESSAGE-'].update(text)
 
 # todo: PV power must remain for x minutes before decision
 # OK todo: use minimum charge time / pause time
@@ -76,7 +82,6 @@ def processChargerData(sysData):
             sysData.measuredPhases = 1
 
         sysData.actCurrSet = chargerData['amp']
-
 
     sysData.carState = const.C_CHARGER_STATUS_TEXT[int(chargerData['car'])]
 
@@ -228,3 +233,15 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     return new_chargeMode
 
+
+def sprint(*args, **kwargs):
+    """
+    :param args: prints
+    :param kwargs:
+    :return: resulting string
+    """
+    output = io.StringIO()
+    print(*args, file=output, **kwargs)
+    retString = output.getvalue()
+    output.close()
+    return retString
