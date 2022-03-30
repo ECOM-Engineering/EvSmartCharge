@@ -24,7 +24,7 @@ class SysData:  # kind of C structure
     batteryLevel = 0  # % from Renault server car API
     solarPower = 0  # kw from Solar Inverter Cloud
     pvToGrid = 0  # kW from Solar Inverter Cloud
-    chargePower = 0.0  # W  from go-eCharger Wallbox
+    chargePower = 0.0  # kW  from go-eCharger Wallbox
     currentL1 = 0  # A  from go-eCharger Wallbox
     voltageL1 = 0  # V  from go-eCharger Wallbox
     chargeActive = False  # from go-eCharger
@@ -48,7 +48,7 @@ class ChargeModes:  # kind of enum
     EXTERN = 4
     STOPPED = 5
     FORCE_REQUEST = 6
-    CAR_ERROR = 7  # todo if car data read error suspend charging
+    CAR_ERROR = 7
 
 def processChargerData(sysData):
     """
@@ -72,7 +72,7 @@ def processChargerData(sysData):
             sysData.chargePower = chargerData['nrg'][11] / 1000 # original value is in W
             sysData.actPhases = chargerData['psm']
             sysData.currentL1 = chargerData['nrg'][4]     # original alue is in 1A
-            if chargerData['frc'] == 2: sysData.chargeActive = True # True while charging
+            if chargerData['frc'] != 1: sysData.chargeActive = True # True while charging
             else: sysData.chargeActive = False
         # V1                SysData.currentL1 = chargerData['nrg'][4] / 100
         sysData.voltageL1 = chargerData['nrg'][0]
@@ -101,6 +101,8 @@ def calcChargeCurrent(sysData, maxCurrent_1P, minCurrent_3P):
     solarChargeCurrent = 0
     sysData.reqPhases = const.C_CHARGER_1_PHASE
 
+    # todo: correct for external charge: calc depending on chargeMode AND pvToGrid
+
     newPower = sysData.chargePower + sysData.pvToGrid - const.C_PV_MIN_REMAIN  # calculation in kW
 
     if sysData.voltageL1 > 0:
@@ -113,9 +115,6 @@ def calcChargeCurrent(sysData, maxCurrent_1P, minCurrent_3P):
             sysData.reqPhases = const.C_CHARGER_3_PHASES
     else:
         sysData.calcPvCurrent_1P = int(solarChargeCurrent)
-
-    #    if solarChargeCurrent > const.C_CHARGER_MAX_CURRENT:
-    #        solarChargeCurrent = const.C_CHARGER_MAX_CURRENT
 
     return sysData
 
@@ -140,6 +139,17 @@ def evalChargeMode(chargeMode, sysData, settings):
             new_chargeMode = ChargeModes.IDLE  # recover processing
     else:
         new_chargeMode = ChargeModes.UNPLUGGED
+
+    if sysData.carErrorCounter > const.C_MAX_CAR_CONNECTION_ERRORS:
+        new_chargeMode = ChargeModes.CAR_ERROR
+        charge.stop_charging()
+        return new_chargeMode
+    else:
+        if chargeMode == ChargeModes.CAR_ERROR:
+            print('RECOVERED Reading Car Data, count =' + str(sysData.carErrorCounter))
+            chargeMode = ChargeModes.IDLE
+            new_chargeMode = chargeMode
+            sysData.carErrorCounter = 0
 
     if chargeMode == ChargeModes.FORCE_REQUEST:
         if sysData.batteryLevel < manualSettings['chargeLimit']:
@@ -213,17 +223,20 @@ def evalChargeMode(chargeMode, sysData, settings):
             new_chargeMode = ChargeModes.IDLE
             print('External Charge OFF')
 
-    if chargeMode == ChargeModes.IDLE:
-        freeSolarCurrent = sysData.calcPvCurrent_1P
-        if freeSolarCurrent >= const.C_CHARGER_MIN_CURRENT and sysData.batteryLevel < pvSettings['chargeLimit']:
-            if sysData.pvHoldTimer.read() == 0:
-                sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
-                new_chargeMode = ChargeModes.PV
-                print('Charge ON. Current', int(freeSolarCurrent))
-                charge.set_current(int(freeSolarCurrent))
-                charge.start_charging()
-        elif sysData.chargePower > 1:
+    if chargeMode == ChargeModes.IDLE and sysData.batteryLevel >= 0:
+        if sysData.chargeActive:  # test
             new_chargeMode = ChargeModes.EXTERN
+        else:
+            freeSolarCurrent = sysData.calcPvCurrent_1P  # starting always with one phase
+            if freeSolarCurrent >= const.C_CHARGER_MIN_CURRENT and sysData.batteryLevel < pvSettings['chargeLimit']:
+                if sysData.pvHoldTimer.read() == 0:
+                    sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
+                    new_chargeMode = ChargeModes.PV
+                    print('Charge ON. Current', int(freeSolarCurrent))
+                    charge.set_current(int(freeSolarCurrent))
+                    charge.start_charging()
+#        elif sysData.chargePower > 1:
+#            new_chargeMode = ChargeModes.EXTERN
 
     if new_chargeMode != chargeMode:
         print('NEW Mode:', new_chargeMode, 'OLD:', chargeMode)
