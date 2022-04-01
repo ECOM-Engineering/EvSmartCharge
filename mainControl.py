@@ -139,7 +139,7 @@ while not exitApp:
                 if sysData.batteryLevel < 0:
                     sysData.carErrorCounter = sysData.carErrorCounter + 1
                     print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
-                    printMsg('ERROR Reading Car Data, count =', sysData.carErrorCounte)
+                    printMsg('ERROR Reading Car Data, count =' + str(sysData.carErrorCounter))
                 else:
                     sysData.carErrorCounter = 0
             else:
