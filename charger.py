@@ -60,11 +60,14 @@ class Charger:
                 self.chargerData['statusCode'] = statusCode
 
         except ConnectionError:
-            self.chargerData['statusCode'] = -1
+            statusCode = -1
             print('CONNECTION ERROR!')
         except JSONDecodeError:
-            self.chargerData['statusCode'] = -2
+            statusCode = -2
             print('JSON ERROR')
+        except:
+            statusCode = -3
+            print('UNKNOWN ERROR')
 
         self.chargerData['apiVer'] = self.api_version
         self.chargerData['statusCode'] = statusCode
