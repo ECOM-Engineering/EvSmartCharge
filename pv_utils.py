@@ -159,10 +159,7 @@ def evalChargeMode(chargeMode, sysData, settings):
                 sysData.reqPhases = const.C_CHARGER_1_PHASE
 
             if sysData.phaseHoldTimer.read() == 0:
-#                access.ecSetChargerData("acs", "0")  # authenticate
-
                 if sysData.actPhases != sysData.reqPhases:  # phase switch requested?
-#                    access.ecSetChargerData("psm", sysData.reqPhases)
                     charge.set_phase(sysData.reqPhases)
                     sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
 

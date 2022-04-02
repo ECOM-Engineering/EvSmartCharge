@@ -155,7 +155,6 @@ while not exitApp:
             forceFlag = False
 
         # ---------------------------------------- update display elements -------------------------------------------
-        #    if sysData.carPlugged and t1s == 0:  # first run
         if firstRun:
             window['Force Charge'].update(disabled=False)
             window['Stop Charge'].update(disabled=False)

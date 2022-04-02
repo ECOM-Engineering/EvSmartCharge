@@ -4,7 +4,8 @@
 
 ## Purpose
 
-A smart EV vehicle charging solution using as much of free solar power as available.  It uses remainig solar power besides other higher priority power consumers like heatpumps and other household equipment.  The system can operate autonomously and also manually as remote control.
+A smart EV vehicle charging solution using as much of free solar power as available.  
+It uses remainig solar power besides other higher priority power consumers like heatpumps and other household equipment.  The system can operate autonomously and also manually as remote control.
 
 This solution uses the awsome  [go-eCharger](https://go-e.co/)
 
@@ -35,7 +36,9 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 [pysmplegui](https://pysimplegui.readthedocs.io/en/latest/) graphical interface tool
 
-[go-eCharger API V2](https://github.com/goecharger/go-eCharger-API-v2)  WLAN or Internet access to the go-eCharger Wallbox
+[go-eCharger API V2](https://github.com/goecharger/go-eCharger-API-v2)  WLAN or Internet access to the go-eCharger Wallbox  or  or  
+
+[go-eCharger API V1](https://github.com/goecharger/go-eCharger-API-v1) WLAN or Internet access to the go-eCharger Wallbox
 
 [SolarEdge API](https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf)
 
