@@ -184,9 +184,6 @@ def evalChargeMode(chargeMode, sysData, settings):
             print('CHARGE STOPPED by user')
             charge.stop_charging()
             charge.set_phase(const.C_CHARGER_1_PHASE)
-            # access.ecSetChargerData("frc", "1")  # OFF
-            # access.ecSetChargerData("psm", const.C_CHARGER_1_PHASE, tout=10)  #
-            # access.ecSetChargerData("acs", "1")  # authentication required
         else:
             print('phaseHoldTimer waiting:', sysData.phaseHoldTimer.read())
 
@@ -202,8 +199,6 @@ def evalChargeMode(chargeMode, sysData, settings):
                 new_chargeMode = ChargeModes.IDLE
                 print('Solar charge OFF')
                 charge.stop_charging()
-#                access.ecSetChargerData("frc", "1")  # OFF
-#                access.ecSetChargerData("acs", "1")  # authentication required
                 sysData.pvHoldTimer.set(const.C_SYS_MIN_PV_HOLD_TIME)
         else:
             if freeSolarCurrent != sysData.actCurrSet:
@@ -232,8 +227,6 @@ def evalChargeMode(chargeMode, sysData, settings):
                     print('Charge ON. Current', int(freeSolarCurrent))
                     charge.set_current(int(freeSolarCurrent))
                     charge.start_charging()
-#        elif sysData.chargePower > 1:
-#            new_chargeMode = ChargeModes.EXTERN
 
     if new_chargeMode != chargeMode:
         print('NEW Mode:', new_chargeMode, 'OLD:', chargeMode)

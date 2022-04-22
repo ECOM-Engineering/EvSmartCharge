@@ -125,7 +125,6 @@ while not exitApp:
                 sysData.pvToGrid = 0
 
             if not firstRun:
-#                ExecImmediate = False
                 chargeMode = pv_utils.evalChargeMode(chargeMode, sysData, settings)
 
         # read car data
@@ -141,7 +140,9 @@ while not exitApp:
                     print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
                     printMsg('ERROR Reading Car Data, count =' + str(sysData.carErrorCounter))
                 else:
-                    sysData.carErrorCounter = 0
+                    if sysData.carErrorCounter > 0:
+                        printMsg('Car Error recovered')
+                        sysData.carErrorCounter = 0
             else:
                 sysData.batteryLevel = 0
 
@@ -202,11 +203,6 @@ while not exitApp:
             elif chargeMode == ChargeModes.CAR_ERROR:
                 printMsg('ERROR: no car connection. Count =' + str(sysData.carErrorCounter))
 
-#        if sysData.chargeActive:
-#            remainingCharge = limit - sysData.batteryLevel
-#            printMsg("Charging, remaining " + str(remainingCharge) + "%")
-
-
         if sysData.batteryLevel >= limit - 2:  # display as full / charge limit reached
             batt_color = (const.C_BATT_COLORS[4], '#9898A0')
         else:
@@ -231,6 +227,7 @@ while not exitApp:
         window['-toGrid-'].update(sysData.pvToGrid)
 
 
+# store last window position
 if (event != window.was_closed()):
     win_location = window.current_location()
     iniFile = open(const.C_INI_FILE, 'w')
