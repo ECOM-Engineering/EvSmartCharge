@@ -38,6 +38,8 @@ class SysData:  # kind of C structure
     pvHoldTimer = timers.EcTimer()
     phaseHoldTimer = timers.EcTimer()
     carErrorCounter = 0 # increment if eror during car data read
+    pvError = 0
+    chargerError = 0
 
 class ChargeModes:  # kind of enum
     """Constants defining system state."""
@@ -54,10 +56,16 @@ def processChargerData(sysData):
     """
     Converts charger data into sysData format
     :param sysData: data record similar to C structure
-    :return: True, if car is plugged
+    :return: updated sysData
     """
     chargerData = charge.get_charger_data()
     print('Charger Data:', chargerData)
+    if(chargerData['statusCode'] != 200):
+        sysData.chargerError = chargerData['statusCode']
+        return sysData
+    else:
+        sysData.chargerError = 0
+
     sysData.chargerAPIversion = chargerData['apiVer']
     sysData.carPlugged = False
     sysData.chargePower = 0
@@ -244,7 +252,7 @@ def sprint(*args, **kwargs):
     :return: resulting string
     """
     output = io.StringIO()
-    print(*args, file=output, **kwargs)
+    print(*args, file=output, **kwargs, end='')
     retString = output.getvalue()
     output.close()
     return retString

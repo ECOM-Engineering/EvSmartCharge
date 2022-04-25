@@ -47,26 +47,28 @@ limit_sign = '▲'
 limit_val = 67  # corresponds to 100%
 
 col1 =  [
-        [sg.Frame(title='Battery Level', size=(500, 80),
+        [sg.Frame(title='Battery Level', size=(530, 80),
          layout=[
-         [batLevelBar, battDisp, sg.Text('% ', pad=0), sg.Text('---', key='-CHARGE_STATE-', pad=8, size=(17, 1))],
+         [batLevelBar, battDisp, sg.Text('% ', pad=0), sg.Text('---', key='-CHARGE_STATE-'), sg.Stretch(), LEDIndicator('-LED_CAR-')],
          [sg.Text(limit_val * ' ' + limit_sign, font=("Arial", 12, "bold"), key='-LIMIT_VAL-', pad=(0, 0), text_color='green1')]])
 #         [battLimit, sg.Text("Limit", pad=(10, 0, 0))]])
          ],
         [sg.Text("")],
 
-        [sg.Frame(title='Charging Power', size=(500,80), layout=[
-        [chargePwrBar, chargeDisp, sg.Text('kW', pad=0), chargeCurrentDisp, sg.Text('A', pad=0), phasesDisp, sg.Text('Phase')],
+        [sg.Frame(title='Charging Power', size=(530,80), layout=[
+        [chargePwrBar, chargeDisp, sg.Text('kW', pad=0), chargeCurrentDisp, sg.Text('A', pad=0), phasesDisp, sg.Text('Phase'),
+         sg.Stretch(), LEDIndicator('-LED_CHARGER-') ],
         [LEDIndicator('-LED_SOLAR-'),  sg.Text('Solar     ', pad=0),
          LEDIndicator('-LED_FORCED-'), sg.Text('Forced    ', pad=0),
          LEDIndicator('-LED_EXTERN-'), sg.Text('Extern', pad=0)]])],
         [sg.Text("")],
 
-        [sg.Frame(title='Solar Power',  size=(500,75), layout=[
-        [solarPwrBar, solarDisp, sg.Text('kW', pad=0), sg.Text('PV total power')],
+        [sg.Frame(title='Solar Power',  size=(530,75), layout=[
+        [solarPwrBar, solarDisp, sg.Text('kW', pad=0), sg.Text('PV total power'), sg.Stretch(), LEDIndicator('-LED_PV-')],
         [solarPwr2GridBar, toGridDisp, sg.Text('kW', pad=0), sg.Text('PV power to grid')]])],
         [sg.Text("")],  # empty line
-        [sg.Frame(title='Messages', size=(500,50), layout=[
+
+        [sg.Frame(title='Messages', size=(530,60), layout=[
         [messageText, sg.Stretch(), LEDIndicator('-LED_MSG-')]])]]
 #       [sg.Text('Initializing ...', key='-MESSAGE-', size=53, text_color ='grey10', background_color ='light grey')]])]]
 
@@ -86,9 +88,12 @@ def testLayout():
             quit()
         window['-battBar-'].UpdateBar(50)
         SetLED(window,'-LED_SOLAR-', 'grey')
-        SetLED(window,'-LED_FORCED-', 'white')
+        SetLED(window,'-LED_FORCED-', 'grey')
         SetLED(window,'-LED_EXTERN-', 'grey')
         SetLED(window,'-LED_MSG-', 'grey')
+        SetLED(window,'-LED_CAR-', 'grey')
+        SetLED(window,'-LED_CHARGER-', 'grey')
+        SetLED(window,'-LED_PV-', 'grey')
 
 if __name__ == "__main__":
     testLayout()

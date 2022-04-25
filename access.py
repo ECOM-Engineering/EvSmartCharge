@@ -107,9 +107,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
     try:
         r = requests.get(url, tout)
         pvData['statusCode'] = r.status_code
-        statusCode = r.status_code
-        pvData['statusCode'] = statusCode
-        if statusCode == 200:
+        if pvData['statusCode'] == 200:
             jsondata = r.json()
             jsondata = jsondata['siteCurrentPowerFlow']
             pvData['pvPower'] = jsondata['PV']['currentPower']

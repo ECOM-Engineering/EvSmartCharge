@@ -29,6 +29,9 @@ window.move(x, y)
 evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
 evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
 evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
+evsGUI.SetLED(window, '-LED_CHARGER-', 'grey')
+evsGUI.SetLED(window, '-LED_CAR-', 'grey')
+evsGUI.SetLED(window, '-LED_PV-', 'grey')
 
 ChargeModes = pv_utils.ChargeModes
 
@@ -60,9 +63,11 @@ else:
     settings = sysSettings.defaultSettings
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
 
-def printMsg(text=''):
+# def printMsg(text=''):
+#     window['-MESSAGE-'].update(text)
+def printMsg(item="", value=""):
+    text = f'{item} {value}'
     window['-MESSAGE-'].update(text)
-
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
@@ -107,21 +112,32 @@ while not exitApp:
 
         # read charger data
         if (t1s % const.C_SYS_CHARGER_CLOCK) == 0:
+            evsGUI.SetLED(window, '-LED_CHARGER-', 'grey')
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             sysData = pv_utils.processChargerData(sysData)
             print('Processing charger data')
+            if sysData.chargerError:
+                evsGUI.SetLED(window, '-LED_CHARGER-', 'red')
+                print('ERROR reading charger, code:',sysData.chargerError)
+            else:
+                evsGUI.SetLED(window, '-LED_CHARGER-', 'light green')
 
         # read solar data
         if (t1s % const.C_SYS_PV_CLOCK) == 0:
+            evsGUI.SetLED(window, '-LED_PV-', 'grey')
             print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
             pvData = access.ec_GetPVData(tout=20)
             if SIMULATE_PV_TO_GRID > 0:
                 pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
             if pvData['statusCode'] == 200:
+                evsGUI.SetLED(window, '-LED_PV-', 'light green')
+                sysData.pvError = 0
                 sysData.solarPower = round(pvData['pvPower'], 1)
                 sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
             else:
-                printMsg('ERROR reading PV data, status:' + str(pvData['statusCode']))
+                evsGUI.SetLED(window, '-LED_PV-', 'red')
+                sysData.pvError = pvData['statusCode']
+                printMsg('ERROR reading PV data, status:', pvData['statusCode'])
                 sysData.pvToGrid = 0
 
             if not firstRun:
@@ -129,6 +145,7 @@ while not exitApp:
 
         # read car data
         if (t1s % const.C_SYS_CAR_CLOCK) == 0:
+            evsGUI.SetLED(window, '-LED_CAR-', 'grey')
             if sysData.carPlugged:
                 print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
                 window.finalize()
@@ -136,12 +153,15 @@ while not exitApp:
                 print('Car data:', carData)
                 sysData.batteryLevel = carData['batteryLevel']
                 if sysData.batteryLevel < 0:
+                    evsGUI.SetLED(window, '-LED_CAR-', 'red')
                     sysData.carErrorCounter = sysData.carErrorCounter + 1
                     print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
-                    printMsg('ERROR Reading Car Data, count =' + str(sysData.carErrorCounter))
+                    printMsg('ERROR Reading Car Data, count =',sysData.carErrorCounter)
                 else:
+                    evsGUI.SetLED(window, '-LED_CAR-', 'light green')
                     if sysData.carErrorCounter > 0:
                         printMsg('Car Error recovered')
+                        chargeMode = ChargeModes.IDLE
                         sysData.carErrorCounter = 0
             else:
                 sysData.batteryLevel = 0
@@ -193,7 +213,7 @@ while not exitApp:
 
             elif chargeMode == ChargeModes.IDLE or chargeMode == ChargeModes.UNPLUGGED:
                 limit = int(settings['pv']['chargeLimit'])
-                limit_pos = int(limit_scale * limit) * ' ' + '▲'
+                limit_pos = int(limit_scale * limit) * ' ' + '▲ '
                 printMsg('IDLE, waiting for event ...')
                 print('IDLE, waiting for event ...')
                 evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
@@ -201,7 +221,7 @@ while not exitApp:
                 evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
 
             elif chargeMode == ChargeModes.CAR_ERROR:
-                printMsg('ERROR: no car connection. Count =' + str(sysData.carErrorCounter))
+                printMsg('ERROR: no car connection. Count =', sysData.carErrorCounter)
 
         if sysData.batteryLevel >= limit - 2:  # display as full / charge limit reached
             batt_color = (const.C_BATT_COLORS[4], '#9898A0')
