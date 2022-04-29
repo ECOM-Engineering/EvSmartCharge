@@ -29,7 +29,10 @@ try:
 except:
     print("error in config file")
 
-C_CHARGER_STATUS_TEXT = ("No Charger access", "Vehicle unplugged", "Charging", "Awaiting Command", "Finished, Ready")
+
+C_CAR_STATE = ["Car Unpluged", "Car Ready", "Car Charging"]
+C_CHARGER_STATUS_TEXT = ("0:Error", "1: Idle", "2: Charging", "3: WaitCa", "4: Completeç, 5: Error")
+#C_CHARGER_STATUS_TEXT = ("No Charger access", "Vehicle unplugged", "Charging", "Awaiting command", "Ready")
 C_CHARGER_3_PHASES = 2         # parameter psm value 3 phase
 C_CHARGER_1_PHASE = 1          # parameter psm value 1 phase
 
@@ -37,21 +40,20 @@ C_CHARGER_1_PHASE = 1          # parameter psm value 1 phase
 C_SYS_BASE_CLOCK = 1            # seconds
 C_SYS_FORECAST_REQ_TIME = 19    # time of day
 C_SYS_FORECAST_TIME = (14, 1)   # time od day, delta day
-
 C_SYS_PV_CLOCK = 50              # seconds
 C_SYS_CAR_CLOCK = 120            # seconds
 C_SYS_CHARGER_CLOCK = 20
-
 C_SYS_MIN_PV_HOLD_TIME = 180    # seconds
 C_SYS_MIN_PHASE_HOLD_TIME = 60  # seconds
+
 C_MAX_CAR_CONNECTION_ERRORS = 2 # stop charging after X consecutive errors
+
 
 C_DEFAULT_SETTINGS_FILE = "./PV_Manager.json"
 C_INI_FILE = "./evsGUI.ini"
 
 
 # ----------------   GUI Constants ----------------------------------
-# C_BATT_COLORS = ["#BB0001", "#CD4700", "#DF8A03", "#748B01", "#00FF7F"]
 C_BATT_COLORS = ["#F70000", "#DE4A00", "#009F59", "#00B259", "#00FF7F"]
 C_BLINK_OK_COLOR = '#CCCCCC'   # light grey
 C_BLINK_ERROR_COLOR = '#E10032'  # red
