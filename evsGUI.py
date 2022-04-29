@@ -63,7 +63,7 @@ col1 =  [
          LEDIndicator('-LED_EXTERN-'), sg.Text('Extern', pad=0)]])],
         [sg.Text("")],
 
-        [sg.Frame(title='Solar Power',  size=(530,75), layout=[
+        [sg.Frame(title='Solar Power',  size=(530,80), layout=[
         [solarPwrBar, solarDisp, sg.Text('kW', pad=0), sg.Text('PV total power'), sg.Stretch(), LEDIndicator('-LED_PV-')],
         [solarPwr2GridBar, toGridDisp, sg.Text('kW', pad=0), sg.Text('PV power to grid')]])],
         [sg.Text("")],  # empty line
