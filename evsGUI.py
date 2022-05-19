@@ -28,6 +28,7 @@ chargeDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-ch
 chargeCurrentDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-chargeCurr-')
 phasesDisp = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', key='-measuredPhases-')
 toGridDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-toGrid-')
+limitDisp = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', key='-limit-')
 
 def LEDIndicator(key=None, radius=30):
     return sg.Graph(canvas_size=(radius, radius),
@@ -44,14 +45,17 @@ def SetLED(win, key, color):
 
 #for test only
 limit_sign = '▲'
-limit_val = 67  # corresponds to 100%
+limit_val = 0  # 67 corresponds to 100%
+
 
 col1 =  [
         [sg.Frame(title='Battery Level', size=(530, 80),
          layout=[
-         [batLevelBar, battDisp, sg.Text('% ', pad=0), sg.Text('---', key='-CHARGE_STATE-'), sg.Stretch(), LEDIndicator('-LED_CAR-')],
-         [sg.Text(limit_val * ' ' + limit_sign, font=("Arial", 12, "bold"), key='-LIMIT_VAL-', pad=(0, 0), text_color='green1')]])
-#         [battLimit, sg.Text("Limit", pad=(10, 0, 0))]])
+         [batLevelBar, battDisp, sg.Text('% ', pad=0), sg.Text('---', key='-CHARGE_STATE-'),
+          sg.Stretch(), LEDIndicator('-LED_CAR-')],
+         [sg.Text(limit_val * ' ' + limit_sign, font=("Arial", 12), key='-LIMIT_VAL-', pad=(0, 0)),
+          limitDisp, sg.Text('%', pad=0)]])
+#         [))]])
          ],
         [sg.Text("")],
 
@@ -78,7 +82,7 @@ layout = [[sg.Column(col1)],
           ]
 
 # create window`
-window = sg.Window('ECOM EVS-1 Smart Solar Charging', layout, icon=const.C_LOGO)
+window = sg.Window('ECOM EVS-1 Smart Solar Charging V' + const.C_APP_VERSION, layout, icon=const.C_LOGO)
 
 
 def testLayout():

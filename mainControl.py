@@ -5,14 +5,13 @@ import configparser as CP
 
 import const
 import access
+import timers
 import utils
 import sysSettings
 import popCharge
 import popSettings
 
 SIMULATE_PV_TO_GRID = 0
-
-
 
 # restore window position
 config = CP.ConfigParser()
@@ -41,7 +40,7 @@ chargeMode = ChargeModes.IDLE  # default
 oldChargeMode = None  # used for detection of state transitions
 sysData = utils.SysData
 go_e = utils.charge
-
+chargeLogTimer = timers.EcTimer()
 
 
 # initial of module global variables
@@ -53,11 +52,13 @@ pvChargeOn = False
 chargeState = 0
 exitApp = False
 limit_pos = ''
-limit = 0
+limit = int(0)
 limit_scale = 67 / 100
 forceFlag = False
 firstRun = True
 messageTxt = ''
+
+
 
 # use existing file or create one with default values
 if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
@@ -72,7 +73,8 @@ def printMsg(item="", value=""):
     return text
 
 messageTxt = printMsg('Power ON')
-utils.writeLog(sysData, messageTxt, chargeMode)
+utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
+go_e.stop_charging()
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
@@ -80,6 +82,8 @@ while not exitApp:
     event, values = window.read(timeout=100)
     if event == 'Quit' or window.was_closed():
         go_e.stop_charging()
+        messageTxt = "User Exit App"
+        utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
         exitApp = True
 
     elif event == 'Force Charge':
@@ -95,6 +99,7 @@ while not exitApp:
         if done:
             settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
             limit = settings['pv']['chargeLimit']
+            sysData.batteryLimit = limit
 
     # MAIN LOOP ------------------------------------------------------------------------------------------------------
     # main time division for 1s base tick
@@ -115,76 +120,15 @@ while not exitApp:
         else:
             evsGUI.SetLED(window, '-LED_MSG-', 'grey')
 
-        # read charger data
-        if (t1s % const.C_SYS_CHARGER_CLOCK) == 0:
-            evsGUI.SetLED(window, '-LED_CHARGER-', 'grey')
-            print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
-            sysData = utils.processChargerData(sysData)
-            print('Processing charger data')
-            sysData.carState = "Car ready"
-            if sysData.chargerError:
-                evsGUI.SetLED(window, '-LED_CHARGER-', 'red')
-                print('ERROR reading charger, code:',sysData.chargerError)
-            else:
-                evsGUI.SetLED(window, '-LED_CHARGER-', 'light green')
-
-        # read solar data
-        if (t1s % const.C_SYS_PV_CLOCK) == 0:
-            evsGUI.SetLED(window, '-LED_PV-', 'grey')
-            print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
-            pvData = access.ec_GetPVData(tout=20)
-            if SIMULATE_PV_TO_GRID > 0:
-                pvData['PowerToGrid'] = SIMULATE_PV_TO_GRID
-            if pvData['statusCode'] == 200:
-                evsGUI.SetLED(window, '-LED_PV-', 'light green')
-                sysData.pvError = 0
-                sysData.solarPower = round(pvData['pvPower'], 1)
-                sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
-            else:
-                evsGUI.SetLED(window, '-LED_PV-', 'red')
-                sysData.pvError = pvData['statusCode']
-                messageTxt = printMsg('ERROR reading PV data, status:', pvData['statusCode'])
-                utils.writeLog(sysData, messageTxt, chargeMode)
-                sysData.pvToGrid = 0
-
-            if not firstRun:
-                chargeMode = utils.evalChargeMode(chargeMode, sysData, settings)
-
-        # read car data
-        if (t1s % const.C_SYS_CAR_CLOCK) == 0:
-            evsGUI.SetLED(window, '-LED_CAR-', 'grey')
-            if sysData.carPlugged:
-                print('\n' + time.strftime("%y-%m-%d  %H:%M:%S"))
-                window.finalize()
-                carData = access.ec_GetCarData()
-                print('Car data:', carData)
-                sysData.batteryLevel = carData['batteryLevel']
-                if sysData.batteryLevel < 0:
-                    evsGUI.SetLED(window, '-LED_CAR-', 'red')
-                    sysData.carErrorCounter = sysData.carErrorCounter + 1
-                    print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
-                    messageTxt = printMsg('ERROR Reading Car Data, count =',sysData.carErrorCounter)
-                    utils.writeLog(sysData, messageTxt, chargeMode)
-                else:
-                    evsGUI.SetLED(window, '-LED_CAR-', 'light green')
-                    if sysData.chargeActive:
-                        sysData.carState = "Car Charging"
-                        utils.writeLog(sysData, messageTxt, chargeMode)
-                    if sysData.carErrorCounter > 0:
-                        messageTxt = printMsg('Car Error recovered')
-                        utils.writeLog(sysData, messageTxt, chargeMode)
-                        chargeMode = ChargeModes.IDLE
-                        sysData.carErrorCounter = 0
-            else:
-                sysData.batteryLevel = 0
-                sysData.carState = "Car unplugged"
-
+        if sysData.scanTimer.read() == 0:
+            chargeMode = utils.evalChargeMode(chargeMode, sysData, settings)
 
         if sysData.carPlugged and forceFlag == True:
             done = popCharge.popCharge(batteryLevel=sysData.batteryLevel, pop_location=window.current_location())
             if done:
                 settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
                 limit = int(settings['manual']['chargeLimit'])
+                sysData.batteryLimit = limit
                 chargeMode = ChargeModes.FORCE_REQUEST
                 ExecImmediate = True
             forceFlag = False
@@ -193,21 +137,29 @@ while not exitApp:
         if firstRun:
             window['Force Charge'].update(disabled=False)
             window['Stop Charge'].update(disabled=False)
-            messageTxt = printMsg("IDLE, waiting for event ...")
-            utils.writeLog(sysData, messageTxt, chargeMode)
-
+            limit = int(settings['pv']['chargeLimit'])
+            sysData.batteryLimit = limit
+            go_e.set_phase(1)
             firstRun = False
 
-        if limit > 0:
-            limit_pos = int(limit_scale * limit) * ' ' + '▲'
 
+        limit_pos = int(limit_scale * limit) * ' ' + '▲'
+        if sysData.batteryLevel >= limit:  # display as full / charge limit reached
+            batt_color = (const.C_BATT_COLORS[4], '#9898A0')
+            limit_color = 'green1'
+        else:
+            batt_color = (const.C_BATT_COLORS[(sysData.batteryLevel // 21)], '#9898A0')
+            limit_color = 'white'
+
+
+        # event driven displays
         if chargeMode != oldChargeMode:
-            oldChargeMode = chargeMode
+#            oldChargeMode = chargeMode
+            messageTxt = printMsg(const.C_MODE_TXT[chargeMode])
+            utils.writeLog(sysData, messageTxt, chargeMode)
 
-            if chargeMode == ChargeModes.PV:
+            if chargeMode == ChargeModes.PV_INIT or  chargeMode == ChargeModes.PV_EXEC:
                 limit = int(settings['pv']['chargeLimit'])
-                messageTxt = printMsg('SOLAR charge activated')
-                utils.writeLog(sysData, messageTxt, chargeMode)
                 print('SOLAR CHARGE')
                 evsGUI.SetLED(window, '-LED_SOLAR-', 'yellow')
                 window['-chargeBar-'].update(bar_color=('yellow', '#9898A0'))
@@ -215,46 +167,79 @@ while not exitApp:
             elif chargeMode == ChargeModes.FORCED:
                 limit = int(settings['manual']['chargeLimit'])
                 limit_pos = int(limit_scale * limit) * ' ' + '▲'
-                #            print('FORCED CHARGE')
-                messageTxt = printMsg('FORCED charge activated')
-                utils.writeLog(sysData, messageTxt, chargeMode)
                 evsGUI.SetLED(window, '-LED_FORCED-', 'white')
                 window['-chargeBar-'].update(bar_color=('white', '#9898A0'))
 
             elif chargeMode == ChargeModes.EXTERN:
                 limit = 0
                 print('EXTERN CHARGE')
-                messageTxt = printMsg('EXTERNAL CHARGE initiated')
-                utils.writeLog(sysData, messageTxt, chargeMode)
                 evsGUI.SetLED(window, '-LED_EXTERN-', 'blue')
                 window['-chargeBar-'].update(bar_color=('blue', '#9898A0'))
 
             elif chargeMode == ChargeModes.IDLE or chargeMode == ChargeModes.UNPLUGGED:
                 limit = int(settings['pv']['chargeLimit'])
+                sysData.batteryLimit = limit
                 limit_pos = int(limit_scale * limit) * ' ' + '▲ '
-                if sysData.batteryLevel >= limit:  # display as full / charge limit reached
-                    sysData.carState = "Limit Reached"
-                messageTxt = printMsg('IDLE, waiting for event ...')
-                utils.writeLog(sysData, messageTxt, chargeMode)
                 print('IDLE, waiting for event ...')
                 evsGUI.SetLED(window, '-LED_SOLAR-', 'grey')
                 evsGUI.SetLED(window, '-LED_FORCED-', 'grey')
                 evsGUI.SetLED(window, '-LED_EXTERN-', 'grey')
+                if oldChargeMode == ChargeModes.PV_EXEC or chargeMode == ChargeModes.FORCED:
+                    if sysData.batteryLevel >= limit:
+                        messageTxt = printMsg(const.C_MODE_TXT[chargeMode] + ' Limit reached!')
+                        utils.writeLog(sysData, messageTxt, chargeMode)
 
             elif chargeMode == ChargeModes.CAR_ERROR:
-                messageTxt = printMsg('ERROR: no car connection. Count =', sysData.carErrorCounter)
+                messageTxt = printMsg(const.C_MODE_TXT[chargeMode] + 'Count =', sysData.carErrorCounter)
                 utils.writeLog(sysData, messageTxt, chargeMode)
 
-        if sysData.batteryLevel >= limit - 2:  # display as full / charge limit reached
-            batt_color = (const.C_BATT_COLORS[4], '#9898A0')
+            oldChargeMode = chargeMode
+
+        # Cyclic gui refresh
+        # if sysData.batteryLevel >= limit:  # display as full / charge limit reached
+        #     batt_color = (const.C_BATT_COLORS[4], '#9898A0')
+        #     limit_color = 'green1'
+        # else:
+        #     batt_color = (const.C_BATT_COLORS[(sysData.batteryLevel // 21)], '#9898A0')
+        #     limit_color = 'white'
+
+        if sysData.chargerError:
+            evsGUI.SetLED(window, '-LED_CHARGER-', 'red')
+            print('ERROR reading charger, code:',sysData.chargerError)
+        else:
+            evsGUI.SetLED(window, '-LED_CHARGER-', 'light green')
+
+        if sysData.pvError:
+            evsGUI.SetLED(window, '-LED_PV-', 'red')
+        else:
+            evsGUI.SetLED(window, '-LED_PV-', 'light green')
+
+        if sysData.carPlugged == True:
+            if sysData.carErrorCounter > 0:
+                evsGUI.SetLED(window, '-LED_CAR-', 'red')
+                sysData.carState = "Error reading car"
+            else:
+                evsGUI.SetLED(window, '-LED_CAR-', 'light green')
+                if chargeMode == ChargeModes.IDLE:
+                    sysData.carState = "Car ready"
 
         else:
-            batt_color = (const.C_BATT_COLORS[(sysData.batteryLevel // 21)], '#9898A0')
+            evsGUI.SetLED(window, '-LED_CAR-', 'grey')
+            sysData.carState = "Car unplugged"
+
+        if sysData.chargeActive == True:
+            if chargeLogTimer.read() == 0:
+                sysData.carState = "CAR CHARGING"
+                messageTxt = printMsg(const.C_MODE_TXT[chargeMode])
+                utils.writeLog(sysData, messageTxt, chargeMode)
+                chargeLogTimer.set(const.C_SYS_LOG_INTERVAL)
 
         window['-battBar-'].update(current_count=sysData.batteryLevel)
         window['-battBar-'].update(bar_color=batt_color)
 
         window['-LIMIT_VAL-'].update(limit_pos)
+        window['-LIMIT_VAL-'].update(text_color=limit_color)
+        window['-limit-'].update(limit)
         window['-batt-'].update(sysData.batteryLevel)
         window['-CHARGE_STATE-'].update(sysData.carState)
 

@@ -92,11 +92,9 @@ def ec_GetCarData():
 
 
 # noinspection PyPep8
-
-
 def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
     """
-    Get relevant data from PV inverter.
+    Get relevant data from PV inverter. API doc: https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf
 
     :param tout: timeout for url access
     :param url: complete url including api key
@@ -112,6 +110,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
             jsondata = jsondata['siteCurrentPowerFlow']
             pvData['pvPower'] = jsondata['PV']['currentPower']
             pvData['LoadPower'] = jsondata['LOAD']['currentPower']
+#            pvData['PowerToGrid'] = jsondata['GRID']['currentPower']
             pvData['PowerToGrid'] = pvData['pvPower'] - pvData['LoadPower']
     except ConnectionError:
         pvData['statusCode'] = "-1"

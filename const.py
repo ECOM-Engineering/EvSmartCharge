@@ -1,9 +1,14 @@
 import configparser as CP
 
+C_APP_VERSION = '0.9.0rc1'
 configFile = "./evs.cfg"
+C_DEFAULT_SETTINGS_FILE = "./PV_Manager.json"
+C_INI_FILE = "./evsGUI.ini"
+
 config = CP.ConfigParser()
 try:
     config.read(configFile)
+    C_LOG_PATH = config['SYSTEM']['log_path']
 
     C_RENAULT_COUNTRY = config['RENAULT_CAR']['country']
     C_RENAULT_USER = config['RENAULT_CAR']['user']
@@ -25,14 +30,28 @@ try:
 
     C_SOLAR_URL = config['PV_CONSTANTS']['solar_url']
     C_PV_MIN_REMAIN = float(config['PV_CONSTANTS']['pv_min_remain'])
+    C_SYS_LOG_INTERVAL = int(config['SYSTEM']['log_interval'])
 
 except:
     print("error in config file")
 
 
 C_CAR_STATE = ["Car Unpluged", "Car Ready", "Car Charging"]
-C_CHARGER_STATUS_TEXT = ("0:Error", "1: Idle", "2: Charging", "3: WaitCa", "4: Completeç, 5: Error")
+C_CHARGER_STATUS_TEXT = ("0:Error", "1: Idle", "2: Charging", "3: WaitCar", "4: Completeç, 5: Error")
 #C_CHARGER_STATUS_TEXT = ("No Charger access", "Vehicle unplugged", "Charging", "Awaiting command", "Ready")
+C_MODE_TXT  = ["CAR UNPLUGGED",
+               "IDLE, waiting for event ...",
+               "SOLAR CHARGE init ...",
+               "SOLAR CHARGE active",
+               "FORCED charge initiated",
+               "FORCED charge active",
+               "FORCED charge stopped",
+               "EXTERNAL charge active",
+               "LIMIT reached",
+               "ERROR Car connection",
+               "ERROR on charger",
+               "ERROR on PV"]
+
 C_CHARGER_3_PHASES = 2         # parameter psm value 3 phase
 C_CHARGER_1_PHASE = 1          # parameter psm value 1 phase
 
@@ -40,17 +59,20 @@ C_CHARGER_1_PHASE = 1          # parameter psm value 1 phase
 C_SYS_BASE_CLOCK = 1            # seconds
 C_SYS_FORECAST_REQ_TIME = 19    # time of day
 C_SYS_FORECAST_TIME = (14, 1)   # time od day, delta day
-C_SYS_PV_CLOCK = 50              # seconds
-C_SYS_CAR_CLOCK = 120            # seconds
-C_SYS_CHARGER_CLOCK = 20
+C_SYS_PV_CLOCK = 50             # seconds
+C_SYS_CHARGER_CLOCK = 25        # PV_CLOCK / 2
+C_SYS_CAR_CLOCK = 120           # seconds
+
 C_SYS_MIN_PV_HOLD_TIME = 180    # seconds
 C_SYS_MIN_PHASE_HOLD_TIME = 60  # seconds
+C_SYS_IDLE_SCAN_TIME = 20
+
+
 
 C_MAX_CAR_CONNECTION_ERRORS = 2 # stop charging after X consecutive errors
 
 
-C_DEFAULT_SETTINGS_FILE = "./PV_Manager.json"
-C_INI_FILE = "./evsGUI.ini"
+
 
 
 # ----------------   GUI Constants ----------------------------------

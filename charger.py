@@ -135,15 +135,20 @@ class Charger:
         :param current: value as integer
         :return:  html status, 200 is OK
         """
+
+        status_code = -2  #parameter Error
         if self.api_version == 1:
             param = 'amx'
         else:
             param = 'amp'
-        status_code = self.__set_charger_param(param, current)
+        if current <= const.C_CHARGER_MAX_CURRENT:
+            status_code = self.__set_charger_param(param, current)
         return status_code
+
 
     def set_phase(self, phase):
         """
+        Switch 1 to 3 phase or vice versa.
 
         :param phase: value 1 or 3. Only valid for API version 2 (charger series CM-03)
         :return:  html status, 200 is OK, -1 if command not recognized
@@ -162,10 +167,10 @@ class Charger:
 
 # test
 if __name__ == "__main__":
-    go = Charger("http://192.168.0.30", 2)
+    # go = Charger("http://192.168.0.30", 2)
     #    go = Charger("http://192.168.0.11", 1)
 
-    # go = Charger(const.C_CHARGER_WIFI_URL, 2)
+    go = Charger(const.C_CHARGER_WIFI_URL, 2)
 
     status = go.set_current(7)
     print('set_current() status =', status)
