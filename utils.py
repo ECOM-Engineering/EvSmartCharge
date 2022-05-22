@@ -94,10 +94,10 @@ def processChargerData(sysData):
         else:  # API V2
             sysData.chargePower = chargerData['nrg'][11] / 1000 # original value is in W
             sysData.actPhases = chargerData['psm']
-            sysData.currentL1 = chargerData['nrg'][4]     # original alue is in 1A
+            sysData.currentL1 = chargerData['nrg'][4]     # original value is in 1A
             if chargerData['frc'] == 2: sysData.chargeActive = True # True while charging
             else: sysData.chargeActive = False
-        # V1                sysData.currentL1 = chargerData['nrg'][4] / 100
+
         sysData.voltageL1 = chargerData['nrg'][0]
         if chargerData['nrg'][6] > 1:  # current on L3, if charging with 3 measuredPhases
             sysData.measuredPhases = 3
@@ -217,6 +217,7 @@ def evalChargeMode(chargeMode, sysData, settings):
                                 or sysData.calcPvCurrent_1P < const.C_CHARGER_MIN_CURRENT:
             charge.stop_charging()
             charge.set_phase(const.C_CHARGER_1_PHASE)
+            sysData.chargeActive = False
             new_chargeMode = ChargeModes.IDLE
 
         #### charging process control
@@ -289,7 +290,8 @@ def evalChargeMode(chargeMode, sysData, settings):
             new_chargeMode = ChargeModes.IDLE
 
     elif chargeMode == ChargeModes.UNPLUGGED:
-        new_chargeMode = ChargeModes.IDLE
+        if sysData.carPlugged == True:
+            new_chargeMode = ChargeModes.IDLE
 
 
     if sysData.pvError  >= 2: # continue charging with old data below this limit

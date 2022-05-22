@@ -154,7 +154,6 @@ while not exitApp:
 
         # event driven displays
         if chargeMode != oldChargeMode:
-#            oldChargeMode = chargeMode
             messageTxt = printMsg(const.C_MODE_TXT[chargeMode])
             utils.writeLog(sysData, messageTxt, chargeMode)
 
@@ -196,12 +195,6 @@ while not exitApp:
             oldChargeMode = chargeMode
 
         # Cyclic gui refresh
-        # if sysData.batteryLevel >= limit:  # display as full / charge limit reached
-        #     batt_color = (const.C_BATT_COLORS[4], '#9898A0')
-        #     limit_color = 'green1'
-        # else:
-        #     batt_color = (const.C_BATT_COLORS[(sysData.batteryLevel // 21)], '#9898A0')
-        #     limit_color = 'white'
 
         if sysData.chargerError:
             evsGUI.SetLED(window, '-LED_CHARGER-', 'red')
@@ -222,13 +215,12 @@ while not exitApp:
                 evsGUI.SetLED(window, '-LED_CAR-', 'light green')
                 if chargeMode == ChargeModes.IDLE:
                     sysData.carState = "Car ready"
-
         else:
             evsGUI.SetLED(window, '-LED_CAR-', 'grey')
             sysData.carState = "Car unplugged"
 
         if sysData.chargeActive == True:
-            if chargeLogTimer.read() == 0:
+            if chargeLogTimer.read() == 0:  # cyclig log entry
                 sysData.carState = "CAR CHARGING"
                 messageTxt = printMsg(const.C_MODE_TXT[chargeMode])
                 utils.writeLog(sysData, messageTxt, chargeMode)
@@ -239,7 +231,7 @@ while not exitApp:
 
         window['-LIMIT_VAL-'].update(limit_pos)
         window['-LIMIT_VAL-'].update(text_color=limit_color)
-        window['-limit-'].update(limit)
+        window['-limit-'].update(int(limit))
         window['-batt-'].update(sysData.batteryLevel)
         window['-CHARGE_STATE-'].update(sysData.carState)
 

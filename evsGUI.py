@@ -45,7 +45,7 @@ def SetLED(win, key, color):
 
 #for test only
 limit_sign = '▲'
-limit_val = 0  # 67 corresponds to 100%
+limit_val = int(0)  # 67 corresponds to 100%
 
 
 col1 =  [
