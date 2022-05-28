@@ -106,6 +106,9 @@ def processChargerData(sysData):
 
         sysData.actCurrSet = chargerData['amp']
 
+    else:  # car is unplugged
+        sysData.chargeActive = False
+
     sysData.chargerState = const.C_CHARGER_STATUS_TEXT[int(chargerData['car'])]
     return sysData
 
@@ -120,6 +123,9 @@ def calcChargeCurrent(sysData, chargeMode, maxCurrent_1P, minCurrent_3P):
     :param minCurrent_3P:   [A] minimum used for switch overr to 3 phases
     :return sysData:        updatad data record
     """
+
+    if chargeMode == ChargeModes.UNPLUGGED:
+        return sysData
 
     calc_free_current = 0
 
@@ -164,7 +170,7 @@ def evalChargeMode(chargeMode, sysData, settings):
     """
 
     sysData.scanTimer.set(const.C_SYS_IDLE_SCAN_TIME)  # sets the cyclic timing
-    new_chargeMode = chargeMode  #stay in mode if nothing happened
+    new_chargeMode = chargeMode  #stay in mode if nothing happens
     pvSettings = settings['pv']
     manualSettings = settings['manual']
     pvAllow3phases = pvSettings['allow_3_phases']
@@ -174,22 +180,23 @@ def evalChargeMode(chargeMode, sysData, settings):
     sysData = processChargerData(sysData)
     if sysData.chargerError == 0:
         if sysData.carPlugged == False:
-            chargeMode = ChargeModes.IDLE
+#            chargeMode = ChargeModes.IDLE
             new_chargeMode = ChargeModes.UNPLUGGED
     else:
         chargeMode = ChargeModes.CHARGER_ERROR
 
 #### Read battery level from car data
-    if sysData.carScanTimer.read() == 0:
-        sysData.carScanTimer.set(const.C_SYS_CAR_CLOCK)
-        carData = access.ec_GetCarData()
-        print('Car data:', carData)
-        sysData.batteryLevel = carData['batteryLevel']
-        if sysData.batteryLevel < 0:
-            sysData.carErrorCounter = sysData.carErrorCounter + 1
-            print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
-        else:
-            sysData.carErrorCounter = 0
+    if sysData.carPlugged == True:
+        if sysData.carScanTimer.read() == 0:
+            sysData.carScanTimer.set(const.C_SYS_CAR_CLOCK)
+            carData = access.ec_GetCarData()
+            print('Car data:', carData)
+            sysData.batteryLevel = carData['batteryLevel']
+            if sysData.batteryLevel < 0:
+                sysData.carErrorCounter = sysData.carErrorCounter + 1
+                print('ERROR Reading Car Data, count =', sysData.carErrorCounter)
+            else:
+                sysData.carErrorCounter = 0
 
 #### Read Solar data and charge decision
     if sysData.pvScanTimer.read() == 0:
@@ -210,7 +217,10 @@ def evalChargeMode(chargeMode, sysData, settings):
             sysData.pvError = sysData.pvError + 1
 
     if chargeMode == ChargeModes.PV_EXEC:
-        new_chargeMode = chargeMode  # stay in mode
+        if sysData.carPlugged == True:
+            new_chargeMode = chargeMode  # stay in mode
+        else:
+            new_chargeMode = ChargeModes.UNPLUGGED
 
         #### charge end ctriteria
         if sysData.batteryLevel >= sysData.batteryLimit \
