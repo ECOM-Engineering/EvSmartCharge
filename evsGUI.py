@@ -28,7 +28,8 @@ chargeDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-ch
 chargeCurrentDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-chargeCurr-')
 phasesDisp = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', key='-measuredPhases-')
 toGridDisp = sg.Text(0, size=(4, 1), pad=(0, 0), justification='right', key='-toGrid-')
-limitDisp = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', key='-limit-')
+limitText = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', enable_events=True, key='-limit-')
+
 
 def LEDIndicator(key=None, radius=30):
     return sg.Graph(canvas_size=(radius, radius),
@@ -43,18 +44,19 @@ def SetLED(win, key, color):
     graph.draw_circle((0, 0), 12, fill_color=color, line_color='black')
 
 
-#for test only
+
 limit_sign = '▲'
 limit_val = int(0)  # 67 corresponds to 100%
 
+limitSign = sg.Text(limit_val * ' ' + limit_sign, font=("Arial", 12), key='-LIMIT_VAL-', enable_events=True, pad=(0, 0))
 
 col1 =  [
         [sg.Frame(title='Battery Level', size=(530, 80),
-         layout=[
+                  layout=[
          [batLevelBar, battDisp, sg.Text('% ', pad=0), sg.Text('---', key='-CHARGE_STATE-'),
           sg.Stretch(), LEDIndicator('-LED_CAR-')],
-         [sg.Text(limit_val * ' ' + limit_sign, font=("Arial", 12), key='-LIMIT_VAL-', pad=(0, 0)),
-          limitDisp, sg.Text('%', pad=0)]])
+         [limitSign,
+          limitText, sg.Text('%', pad=0)]])
 #         [))]])
          ],
         [sg.Text("")],

@@ -76,6 +76,8 @@ messageTxt = printMsg('Power ON')
 utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
 go_e.stop_charging()
 
+
+
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
     # cyclic check for user action
@@ -94,7 +96,7 @@ while not exitApp:
             chargeMode = ChargeModes.STOPPED
             ExecImmediate = True
 
-    elif event == 'PV-Settings':
+    elif event == 'PV-Settings' or event == '-LIMIT_VAL-' or event == '-limit-':
         done = popSettings.popSettings(batteryLevel=sysData.batteryLevel, pop_location=window.current_location())
         if done:
             settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
