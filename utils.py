@@ -1,4 +1,3 @@
-import io
 import os
 from datetime import datetime
 import csv
@@ -11,11 +10,9 @@ import access
 # def printMsg(text=''):
 #     window['-MESSAGE-'].update(text)
 
+# todo: !! put all functions in a new class DataProcessing
 # todo: PV power must remain for x minutes before decision
-# OK todo: use minimum charge time / pause time
-# OK todo: set charger aws only once
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
-# OK todo: Override local  decisions with remote control
 
 charge = charger.Charger(const.C_CHARGER_WIFI_URL, const.C_CHARGER_API_VERSION)
 
@@ -65,9 +62,8 @@ class ChargeModes:  # kind of enum
     CHARGER_ERROR = 10
     PV_ERROR = 11
 
-sysData = SysData()
 
-def processChargerData(sysData):
+def processChargerData(sysData = SysData):
     """
     Converts charger data into sysData format
     :param sysData: data record similar to C structure
@@ -183,10 +179,11 @@ def evalChargeMode(chargeMode, sysData, settings):
 #            chargeMode = ChargeModes.IDLE
             new_chargeMode = ChargeModes.UNPLUGGED
     else:
-        chargeMode = ChargeModes.CHARGER_ERROR
+        chargeMode = ChargeModes.CHARGER_ERROR  # force error state
 
 #### Read battery level from car data
-    if sysData.carPlugged == True:
+    if True:  # read data even if car is unplugged
+##    if sysData.carPlugged == True:
         if sysData.carScanTimer.read() == 0:
             sysData.carScanTimer.set(const.C_SYS_CAR_CLOCK)
             carData = access.ec_GetCarData()
@@ -243,12 +240,13 @@ def evalChargeMode(chargeMode, sysData, settings):
                     else:
                         print("PV hold time active ", pv_hold, "sec")
             else:  # initiate phase switch
-                if sysData.phaseHoldTimer.read() == 0:
-                    sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
-                    charge.stop_charging()
-                    charge.set_phase(sysData.reqPhases)
-                else:
-                    print('waiting for phase switch')
+                if pvAllow3phases == True:
+                    if sysData.phaseHoldTimer.read() == 0:
+                        sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
+                        charge.stop_charging()
+                        charge.set_phase(sysData.reqPhases)
+                    else:
+                        print('waiting for phase switch')
 
 #### handle manual start
     elif chargeMode == ChargeModes.FORCE_REQUEST:
