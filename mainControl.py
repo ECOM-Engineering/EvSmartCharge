@@ -1,15 +1,13 @@
-import evsGUI
-import time
-import os.path
 import configparser as CP
+import os.path
 
 import const
-import access
-import timers
-import utils
-import sysSettings
+import evsGUI
 import popCharge
 import popSettings
+import sysSettings
+import timers
+import utils
 
 SIMULATE_PV_TO_GRID = 0
 
@@ -18,7 +16,7 @@ config = CP.ConfigParser()
 window = evsGUI.window
 window.finalize()  # activate window
 config.read(const.C_INI_FILE)
-if (config.has_option('Window', 'position_xy')):
+if config.has_option('Window', 'position_xy'):
     win_location = config['Window']['position_xy']
     win_location = eval(win_location)  # re-format to tuple(x,y)
 else:  # last location will be stored at exit
@@ -42,7 +40,6 @@ sysData = utils.SysData
 go_e = utils.charge
 chargeLogTimer = timers.EcTimer()
 
-
 # initial of module global variables
 t100ms = 0
 t1s = -1
@@ -58,8 +55,6 @@ forceFlag = False
 firstRun = True
 messageTxt = ''
 
-
-
 # use existing file or create one with default values
 if os.path.isfile(const.C_DEFAULT_SETTINGS_FILE):
     settings = sysSettings.readSettings(const.C_DEFAULT_SETTINGS_FILE)
@@ -67,16 +62,16 @@ else:
     settings = sysSettings.defaultSettings
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
 
+
 def printMsg(item="", value=""):
     text = f'{item} {value}'
     window['-MESSAGE-'].update(text)
     return text
 
+
 messageTxt = printMsg('Power ON')
 utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
 go_e.stop_charging()
-
-
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
@@ -107,7 +102,7 @@ while not exitApp:
     # main time division for 1s base tick
     t100ms += 1
     if t100ms > 10:
-        if ExecImmediate == True:  # todo: check handling of ExecImmediate
+        if ExecImmediate:  # todo: check handling of ExecImmediate
             t1s = -1
             ExecImmediate = False
 
@@ -115,10 +110,10 @@ while not exitApp:
         t100ms = 0
         print('.', end='')
         if t1s % 2 == 0:  # blink life sign
-             if chargeMode == ChargeModes.CAR_ERROR:
-                 evsGUI.SetLED(window, '-LED_MSG-', const.C_BLINK_ERROR_COLOR)
-             else:
-                 evsGUI.SetLED(window, '-LED_MSG-', const.C_BLINK_OK_COLOR)
+            if chargeMode == ChargeModes.CAR_ERROR:
+                evsGUI.SetLED(window, '-LED_MSG-', const.C_BLINK_ERROR_COLOR)
+            else:
+                evsGUI.SetLED(window, '-LED_MSG-', const.C_BLINK_OK_COLOR)
         else:
             evsGUI.SetLED(window, '-LED_MSG-', 'grey')
 
@@ -144,7 +139,6 @@ while not exitApp:
             go_e.set_phase(1)
             firstRun = False
 
-
         limit_pos = int(limit_scale * limit) * ' ' + '▲'
         if sysData.batteryLevel >= limit:  # display as full / charge limit reached
             batt_color = (const.C_BATT_COLORS[4], '#9898A0')
@@ -153,13 +147,12 @@ while not exitApp:
             batt_color = (const.C_BATT_COLORS[(sysData.batteryLevel // 21)], '#9898A0')
             limit_color = 'white'
 
-
         # event driven displays
         if chargeMode != oldChargeMode:
             messageTxt = printMsg(const.C_MODE_TXT[chargeMode])
             utils.writeLog(sysData, messageTxt, chargeMode)
 
-            if chargeMode == ChargeModes.PV_INIT or  chargeMode == ChargeModes.PV_EXEC:
+            if chargeMode == ChargeModes.PV_INIT or chargeMode == ChargeModes.PV_EXEC:
                 limit = int(settings['pv']['chargeLimit'])
                 print('SOLAR CHARGE')
                 evsGUI.SetLED(window, '-LED_SOLAR-', 'yellow')
@@ -200,7 +193,7 @@ while not exitApp:
 
         if sysData.chargerError:
             evsGUI.SetLED(window, '-LED_CHARGER-', 'red')
-            print('ERROR reading charger, code:',sysData.chargerError)
+            print('ERROR reading charger, code:', sysData.chargerError)
         else:
             evsGUI.SetLED(window, '-LED_CHARGER-', 'light green')
 
@@ -209,7 +202,7 @@ while not exitApp:
         else:
             evsGUI.SetLED(window, '-LED_PV-', 'light green')
 
-        if sysData.carPlugged == True:
+        if sysData.carPlugged:
             if sysData.carErrorCounter > 0:
                 evsGUI.SetLED(window, '-LED_CAR-', 'red')
                 sysData.carState = "Error reading car"
@@ -221,7 +214,7 @@ while not exitApp:
             evsGUI.SetLED(window, '-LED_CAR-', 'grey')
             sysData.carState = "Car unplugged"
 
-        if sysData.chargeActive == True:
+        if sysData.chargeActive:
             if chargeLogTimer.read() == 0:  # cyclig log entry
                 sysData.carState = "CAR CHARGING"
                 messageTxt = printMsg(const.C_MODE_TXT[chargeMode])
@@ -248,9 +241,8 @@ while not exitApp:
         window['-toGridBar-'].update(current_count=sysData.pvToGrid)
         window['-toGrid-'].update(sysData.pvToGrid)
 
-
 # store last window position
-if (event != window.was_closed()):
+if event != window.was_closed():
     win_location = window.current_location()
     iniFile = open(const.C_INI_FILE, 'w')
     config['Window'] = {'position_xy': win_location}

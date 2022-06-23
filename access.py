@@ -5,6 +5,7 @@ from datetime import timedelta, date, datetime, time
 import const
 from zozo import Zoe
 
+
 # todo: remove User Info (PW) from zoe.getPersonalInfo()
 
 # noinspection SpellCheckingInspection
@@ -70,24 +71,24 @@ def ec_GetCarData():
     try:
         zoe = Zoe(const.C_RENAULT_USER, const.C_RENAULT_PASS)
         zoe.getPersonalInfo()
-    # todo: ignore if error    pos = zoe.googleLocation()
+        # todo: ignore if error    pos = zoe.googleLocation()
         batt = zoe.batteryStatus()
         cockpit = zoe.cockpit()
         carData['statusCode'] = batt['status_code']
         carData['batteryLevel'] = batt['data']['attributes']['batteryLevel']
         carData['plugStatus'] = batt['data']['attributes']['plugStatus']
-#        carData['clima'] = hvac['data']['attributes']['hvacStatus']
+        #        carData['clima'] = hvac['data']['attributes']['hvacStatus']
         carData['mileage'] = cockpit['data']['attributes']['totalMileage']
 
     except ConnectionError:
         carData['statusCode'] = -1
         print('CONNECTION ERROR!')
     except:
-        carData['statusCode']  = -2
+        carData['statusCode'] = -2
         print('JSON ERROR')
 
-#    carData['location'] = pos
-#    print('car Data:', carData)
+    #    carData['location'] = pos
+    #    print('car Data:', carData)
     return carData
 
 
@@ -110,7 +111,7 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
             jsondata = jsondata['siteCurrentPowerFlow']
             pvData['pvPower'] = jsondata['PV']['currentPower']
             pvData['LoadPower'] = jsondata['LOAD']['currentPower']
-#            pvData['PowerToGrid'] = jsondata['GRID']['currentPower']
+            #            pvData['PowerToGrid'] = jsondata['GRID']['currentPower']
             pvData['PowerToGrid'] = pvData['pvPower'] - pvData['LoadPower']
     except ConnectionError:
         pvData['statusCode'] = "-1"
@@ -118,14 +119,14 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
     print(pvData)
     return pvData
 
+
 # --------  test only -----------
 if __name__ == "__main__":
-
-#    ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False)
-     ec_GetCarData()
-    # print("API Version =", const.C_CHARGER_API_VERSION)
-    # ecReadChargerData()
-    # ecSetChargerData("amp", "8")
+    #    ecGetWeatherForecast(forecast_time=14, days=1, JSON_File=False)
+    ec_GetCarData()
+# print("API Version =", const.C_CHARGER_API_VERSION)
+# ecReadChargerData()
+# ecSetChargerData("amp", "8")
 
 #    ecSetChargerData("alw", "0")  # 1 : start charging
 #    ec_GetPVData()

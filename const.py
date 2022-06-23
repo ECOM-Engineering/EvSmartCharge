@@ -1,6 +1,6 @@
 import configparser as CP
 
-C_APP_VERSION = '0.9.0rc1'
+C_APP_VERSION = '0.9.0rc2'
 configFile = "./evs.cfg"
 C_DEFAULT_SETTINGS_FILE = "./PV_Manager.json"
 C_INI_FILE = "./evsGUI.ini"
@@ -30,7 +30,11 @@ try:
 
     C_SOLAR_URL = config['PV_CONSTANTS']['solar_url']
     C_PV_MIN_REMAIN = float(config['PV_CONSTANTS']['pv_min_remain'])
+
+    C_SYS_MIN_PV_HOLD_TIME = int(config['TIMING']['pv_min_hold_time'])
+    C_SYS_MIN_PHASE_HOLD_TIME = int(config['TIMING']['phase_min_hold_time'])
     C_SYS_LOG_INTERVAL = int(config['SYSTEM']['log_interval'])
+
 
 except:
     print("error in config file")
@@ -63,8 +67,7 @@ C_SYS_PV_CLOCK = 50             # seconds
 C_SYS_CHARGER_CLOCK = 25        # PV_CLOCK / 2
 C_SYS_CAR_CLOCK = 120           # seconds
 
-C_SYS_MIN_PV_HOLD_TIME = 180    # seconds
-C_SYS_MIN_PHASE_HOLD_TIME = 60  # seconds
+
 C_SYS_IDLE_SCAN_TIME = 20
 
 

@@ -29,9 +29,10 @@ class Charger:
         self.timeout = timeout
         if self.api_version == 2:
             self.chargerData = {'car': 0, 'amp': 0, 'frc': 0, 'nrg': 15 * [0], 'fsp': 'true', 'psm': 1,
-                                'wh': 0, 'dwo': 0, 'acs': 0, 'err': -1, 'statusCode': -1 }
+                                'wh': 0, 'dwo': 0, 'acs': 0, 'err': -1, 'statusCode': -1}
         else:
-            self.chargerData = {'car': 0, 'amp': 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'ast': 1, 'err': -1, 'statusCode': -1 }
+            self.chargerData = {'car': 0, 'amp': 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'ast': 1, 'err': -1,
+                                'statusCode': -1}
 
     def get_charger_data(self):
         """
@@ -136,7 +137,7 @@ class Charger:
         :return:  html status, 200 is OK
         """
 
-        status_code = -2  #parameter Error
+        status_code = -2  # parameter Error
         if self.api_version == 1:
             param = 'amx'
         else:
@@ -144,7 +145,6 @@ class Charger:
         if current <= const.C_CHARGER_MAX_CURRENT:
             status_code = self.__set_charger_param(param, current)
         return status_code
-
 
     def set_phase(self, phase):
         """

@@ -10,32 +10,33 @@ import access
 # def printMsg(text=''):
 #     window['-MESSAGE-'].update(text)
 
-# todo: !! put all functions in a new class DataProcessing
+# todo: !! put all functions in a new class Utils
 # todo: PV power must remain for x minutes before decision
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
 
 charge = charger.Charger(const.C_CHARGER_WIFI_URL, const.C_CHARGER_API_VERSION)
 
-class SysData:  # kind of C structure
+
+class SysData:  # class variables as kind of (global) C structure
     """All data used for signal processing and display."""
 
     chargerAPIversion = 0
     carPlugged = False
-    batteryLevel = 0    # % from Renault server car API
-    batteryLimit = 0    # %
-    solarPower = 0      # kw from Solar Inverter Cloud
-    pvToGrid = 0        # kW from Solar Inverter Cloud
-    chargePower = 0.0   # kW  from go-eCharger Wallbox
-    currentL1 = 0       # A  from go-eCharger Wallbox
-    voltageL1 = 0       # V  from go-eCharger Wallbox
+    batteryLevel = 0  # % from Renault server car API
+    batteryLimit = 0  # %
+    solarPower = 0  # kw from Solar Inverter Cloud
+    pvToGrid = 0  # kW from Solar Inverter Cloud
+    chargePower = 0.0  # kW  from go-eCharger Wallbox
+    currentL1 = 0  # A  from go-eCharger Wallbox
+    voltageL1 = 0  # V  from go-eCharger Wallbox
     chargeActive = False  # from go-eCharger
     measuredPhases = 0  # 1 | 3 number of measuredPhases
-    actPhases = 0       # actual charger psm setting (C_CHARGER_x_PHASE)
-    actCurrSet = 0      # actual charger setting
-    reqPhases = 0       # requested phase by user or PV situation
+    actPhases = 0  # actual charger psm setting (C_CHARGER_x_PHASE)
+    actCurrSet = 0  # actual charger setting
+    reqPhases = 0  # requested phase by user or PV situation
     calcPvCurrent_1P = 0  # calculated 1 phase current, limited to max. setting
     calcPvCurrent_3P = 0  # calculated 3 phase current, if pvToGrid > minimum 3 phase current
-    setCurrent       = 0
+    setCurrent = 0
     chargerState = "?"
     carState = "---"
     pvHoldTimer = timers.EcTimer()
@@ -43,9 +44,10 @@ class SysData:  # kind of C structure
     scanTimer = timers.EcTimer()
     pvScanTimer = timers.EcTimer()
     carScanTimer = timers.EcTimer()
-    carErrorCounter = 0 # increment if eror during car data read
+    carErrorCounter = 0  # increment if eror during car data read
     pvError = 0
     chargerError = 0
+
 
 class ChargeModes:  # kind of enum
     """Constants defining system state."""
@@ -63,7 +65,7 @@ class ChargeModes:  # kind of enum
     PV_ERROR = 11
 
 
-def processChargerData(sysData = SysData):
+def processChargerData(sysData=SysData):
     """
     Converts charger data into sysData format
     :param sysData: data record similar to C structure
@@ -71,7 +73,7 @@ def processChargerData(sysData = SysData):
     """
     chargerData = charge.get_charger_data()
     print('Charger Data:', chargerData)
-    if(chargerData['statusCode'] != 200):
+    if chargerData['statusCode'] != 200:
         sysData.chargerError = chargerData['statusCode']
         return sysData
     else:
@@ -80,19 +82,23 @@ def processChargerData(sysData = SysData):
     sysData.chargerAPIversion = chargerData['apiVer']
     sysData.carPlugged = False
     sysData.chargePower = 0
-    if int(chargerData['car']) > 1: # car is plugged
+    if int(chargerData['car']) > 1:  # car is plugged
         sysData.carPlugged = True
         if sysData.chargerAPIversion == 1:
             sysData.chargePower = chargerData['nrg'][11] / 100  # original value is in 10W
-            sysData.currentL1 = chargerData['nrg'][4] / 10      # original alue is in 0.1A
-            if chargerData['nrg'][4] > 10: sysData.chargeActive = True
-            else: sysData.chargeActive = False
+            sysData.currentL1 = chargerData['nrg'][4] / 10  # original alue is in 0.1A
+            if chargerData['nrg'][4] > 10:
+                sysData.chargeActive = True
+            else:
+                sysData.chargeActive = False
         else:  # API V2
-            sysData.chargePower = chargerData['nrg'][11] / 1000 # original value is in W
+            sysData.chargePower = chargerData['nrg'][11] / 1000  # original value is in W
             sysData.actPhases = chargerData['psm']
-            sysData.currentL1 = chargerData['nrg'][4]     # original value is in 1A
-            if chargerData['frc'] == 2: sysData.chargeActive = True # True while charging
-            else: sysData.chargeActive = False
+            sysData.currentL1 = chargerData['nrg'][4]  # original value is in 1A
+            if chargerData['frc'] == 2:
+                sysData.chargeActive = True  # True while charging
+            else:
+                sysData.chargeActive = False
 
         sysData.voltageL1 = chargerData['nrg'][0]
         if chargerData['nrg'][6] > 1:  # current on L3, if charging with 3 measuredPhases
@@ -135,7 +141,7 @@ def calcChargeCurrent(sysData, chargeMode, maxCurrent_1P, minCurrent_3P):
     if sysData.voltageL1 > 0:
         calc_free_current = newPower * 1000 / sysData.voltageL1  # calc_free_current ersetzen durch Power?
 
-# TEST!!!    calc_free_current = 9
+    # TEST!!!    calc_free_current = 9
 
     sysData.calcPvCurrent_3P = 0
     sysData.calcPvCurrent_1P = 0
@@ -156,6 +162,7 @@ def calcChargeCurrent(sysData, chargeMode, maxCurrent_1P, minCurrent_3P):
     return sysData
 
 
+# noinspection PyPep8
 def evalChargeMode(chargeMode, sysData, settings):
     """ State machine depending on realtime data and user intervention
 
@@ -166,24 +173,25 @@ def evalChargeMode(chargeMode, sysData, settings):
     """
 
     sysData.scanTimer.set(const.C_SYS_IDLE_SCAN_TIME)  # sets the cyclic timing
-    new_chargeMode = chargeMode  #stay in mode if nothing happens
+    new_chargeMode = chargeMode  # stay in mode if nothing happens
     pvSettings = settings['pv']
     manualSettings = settings['manual']
     pvAllow3phases = pvSettings['allow_3_phases']
 
-######## Cyclic Suppport Functions
-#### Get Charger data
+    ######## Cyclic Suppport Functions
+    #### Get Charger data
     sysData = processChargerData(sysData)
     if sysData.chargerError == 0:
-        if sysData.carPlugged == False:
-#            chargeMode = ChargeModes.IDLE
+        if not sysData.carPlugged:
+            #            chargeMode = ChargeModes.IDLE
             new_chargeMode = ChargeModes.UNPLUGGED
     else:
         chargeMode = ChargeModes.CHARGER_ERROR  # force error state
 
-#### Read battery level from car data
+    #### Read battery level from car data
+    # noinspection PyPep8
     if True:  # read data even if car is unplugged
-##    if sysData.carPlugged == True:
+        ##    if sysData.carPlugged == True:
         if sysData.carScanTimer.read() == 0:
             sysData.carScanTimer.set(const.C_SYS_CAR_CLOCK)
             carData = access.ec_GetCarData()
@@ -195,7 +203,7 @@ def evalChargeMode(chargeMode, sysData, settings):
             else:
                 sysData.carErrorCounter = 0
 
-#### Read Solar data and charge decision
+    #### Read Solar data and charge decision
     if sysData.pvScanTimer.read() == 0:
         sysData.pvScanTimer.set(const.C_SYS_PV_CLOCK)
         pvData = access.ec_GetPVData(tout=20)
@@ -214,14 +222,14 @@ def evalChargeMode(chargeMode, sysData, settings):
             sysData.pvError = sysData.pvError + 1
 
     if chargeMode == ChargeModes.PV_EXEC:
-        if sysData.carPlugged == True:
+        if sysData.carPlugged:
             new_chargeMode = chargeMode  # stay in mode
         else:
             new_chargeMode = ChargeModes.UNPLUGGED
 
         #### charge end ctriteria
         if sysData.batteryLevel >= sysData.batteryLimit \
-                                or sysData.calcPvCurrent_1P < const.C_CHARGER_MIN_CURRENT:
+                or sysData.calcPvCurrent_1P < const.C_CHARGER_MIN_CURRENT:
             charge.stop_charging()
             charge.set_phase(const.C_CHARGER_1_PHASE)
             sysData.chargeActive = False
@@ -232,7 +240,7 @@ def evalChargeMode(chargeMode, sysData, settings):
             if sysData.actPhases == sysData.reqPhases:
                 if sysData.actCurrSet != sysData.setCurrent:
                     charge.set_current(sysData.setCurrent)
-                if sysData.chargeActive == False:
+                if not sysData.chargeActive:
                     pv_hold = sysData.pvHoldTimer.read()
                     if pv_hold == 0:
                         charge.start_charging()
@@ -240,7 +248,7 @@ def evalChargeMode(chargeMode, sysData, settings):
                     else:
                         print("PV hold time active ", pv_hold, "sec")
             else:  # initiate phase switch
-                if pvAllow3phases == True:
+                if pvAllow3phases:
                     if sysData.phaseHoldTimer.read() == 0:
                         sysData.phaseHoldTimer.set(const.C_SYS_MIN_PHASE_HOLD_TIME)
                         charge.stop_charging()
@@ -248,7 +256,7 @@ def evalChargeMode(chargeMode, sysData, settings):
                     else:
                         print('waiting for phase switch')
 
-#### handle manual start
+    #### handle manual start
     elif chargeMode == ChargeModes.FORCE_REQUEST:
         if sysData.batteryLevel < manualSettings['chargeLimit']:
             if manualSettings['3_phases']:
@@ -298,42 +306,44 @@ def evalChargeMode(chargeMode, sysData, settings):
             new_chargeMode = ChargeModes.IDLE
 
     elif chargeMode == ChargeModes.UNPLUGGED:
-        if sysData.carPlugged == True:
+        if sysData.carPlugged:
             new_chargeMode = ChargeModes.IDLE
 
-
-    if sysData.pvError  >= 2: # continue charging with old data below this limit
+    if sysData.pvError >= 2:  # continue charging with old data below this limit
         if chargeMode == ChargeModes.PV_EXEC:
             charge.stop_charging()
             new_chargeMode = ChargeModes.IDLE
 
     if sysData.carErrorCounter >= 2:
-        if chargeMode !=  ChargeModes.EXTERN:
+        if chargeMode != ChargeModes.EXTERN:
             charge.stop_charging()
             new_chargeMode = ChargeModes.IDLE
 
-    if sysData.chargerError == True:
-            charge.stop_charging()  #try stopping charger anyway
-            new_chargeMode = ChargeModes.IDLE
-
+    if sysData.chargerError:
+        charge.stop_charging()  # try stopping charger anyway
+        new_chargeMode = ChargeModes.IDLE
 
     return new_chargeMode
 
 
-def writeLog(sysData, strMessage = "", strMode = "", logpath = const.C_LOG_PATH):
-    '''
+def writeLog(sysData, strMessage="", strMode="", logpath=const.C_LOG_PATH):
+    """
     Write logfile on event or mode change
 
+    :param strMode:
+    :param strMessage:
     :param sysData: object of class SysData
     :param logpath: full path including filew nane
     :return: characters written
-    '''
+    """
 
+    chars = 0
     now = datetime.now()
     date = now.date()
     strDate = date.strftime('%Y-%m-%d')
     strTime = now.strftime('%H:%M:%S')
-    logDict = {"Date": strDate, "Time": strTime, "CarState": sysData.carState, "Actual Mode": strMode, "Message": strMessage,
+    logDict = {"Date": strDate, "Time": strTime, "CarState": sysData.carState, "Actual Mode": strMode,
+               "Message": strMessage,
                "BattLevel": sysData.batteryLevel, "Batt Limit": sysData.batteryLimit, "Pwr2Grid": sysData.pvToGrid,
                "Charge Power": sysData.chargePower, "Phases": sysData.actPhases, "Charge Active": sysData.chargeActive}
     if not os.path.isfile(logpath):
@@ -345,7 +355,7 @@ def writeLog(sysData, strMessage = "", strMode = "", logpath = const.C_LOG_PATH)
         chars = writer.writeheader()
 
     logfile = open(logpath, 'a', newline='')
-    writer = csv.DictWriter(logfile,logDict)
+    writer = csv.DictWriter(logfile, logDict)
     chars = writer.writerow(logDict)
     logfile.close()
     return chars
