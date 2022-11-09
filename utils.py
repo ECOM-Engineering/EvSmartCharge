@@ -190,8 +190,8 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     #### Read battery level from car data
     # noinspection PyPep8
-    if True:  # read data even if car is unplugged
-        ##    if sysData.carPlugged == True:
+#    if True:  # read data even if car is unplugged
+    if sysData.carPlugged == True:
         if sysData.carScanTimer.read() == 0:
             sysData.carScanTimer.set(const.C_SYS_CAR_CLOCK)
             carData = access.ec_GetCarData()
@@ -316,11 +316,13 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     if sysData.carErrorCounter >= 2:
         if chargeMode != ChargeModes.EXTERN:
-            charge.stop_charging()
-            new_chargeMode = ChargeModes.IDLE
+#            sysData.carErrorCounter = 0
+            if chargeMode != ChargeModes.IDLE:
+                charge.stop_charging()
+                new_chargeMode = ChargeModes.IDLE
 
     if sysData.chargerError:
-        charge.stop_charging()  # try stopping charger anyway
+#        charge.stop_charging()  # try stopping charger anyway
         new_chargeMode = ChargeModes.IDLE
 
     return new_chargeMode
