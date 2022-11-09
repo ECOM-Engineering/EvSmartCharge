@@ -1,43 +1,47 @@
 import configparser as CP
+from pathlib import Path
+
+projectRoot = str(Path(__file__).parent)
+print("Project Root = ", projectRoot)
 
 C_APP_VERSION = '0.9.0rc2'
-configFile = "./evs.cfg"
-C_DEFAULT_SETTINGS_FILE = "./PV_Manager.json"
-C_INI_FILE = "./evsGUI.ini"
+configFile = projectRoot + "/evs.cfg"
+C_DEFAULT_SETTINGS_FILE = projectRoot + "/PV_Manager.json"
+C_INI_FILE = projectRoot + "/evsGUI.ini"
 
 config = CP.ConfigParser()
 try:
     config.read(configFile)
-    C_LOG_PATH = config['SYSTEM']['log_path']
-
-    C_RENAULT_COUNTRY = config['RENAULT_CAR']['country']
-    C_RENAULT_USER = config['RENAULT_CAR']['user']
-    C_RENAULT_PASS = config['RENAULT_CAR']['pass']
-    C_RENAULT_VIN = config['RENAULT_CAR']['VIN']
-    C_RENAULT_BATT = int(config['RENAULT_CAR']['battery'])
-
-    C_GIGYA_URL = config['RENAULT_SERVER']['gigya_url']
-    C_GIGYA_API_ID = config['RENAULT_SERVER']['gigya_api_id']
-    C_KAMERON_URL = config['RENAULT_SERVER']['kameron_url']
-    C_KAMERON_API = config['RENAULT_SERVER']['kameron_api']
-
-    C_CHARGER_API_VERSION = int(config['CHARGER']['api_version'])
-    C_CHARGER_WIFI_URL = config['CHARGER']['wifi_url']
-    C_CHARGER_NAME = config['CHARGER']['name']
-    C_CHARGER_MIN_CURRENT = int(config['CHARGER']['min_current'])
-    C_CHARGER_MAX_CURRENT = int(config['CHARGER']['max_current'])
-    C_CHARGER_MAX_POWER = int(config['CHARGER']['max_power'])
-
-    C_SOLAR_URL = config['PV_CONSTANTS']['solar_url']
-    C_PV_MIN_REMAIN = float(config['PV_CONSTANTS']['pv_min_remain'])
-
-    C_SYS_MIN_PV_HOLD_TIME = int(config['TIMING']['pv_min_hold_time'])
-    C_SYS_MIN_PHASE_HOLD_TIME = int(config['TIMING']['phase_min_hold_time'])
-    C_SYS_LOG_INTERVAL = int(config['SYSTEM']['log_interval'])
-
 
 except:
-    print("error in config file")
+    print("error in config file " + configFile)
+
+# todo if no path given, project root is used
+C_LOG_PATH = projectRoot + '/' + config['SYSTEM']['log_path']
+
+C_RENAULT_COUNTRY = config['RENAULT_CAR']['country']
+C_RENAULT_USER = config['RENAULT_CAR']['user']
+C_RENAULT_PASS = config['RENAULT_CAR']['pass']
+C_RENAULT_VIN = config['RENAULT_CAR']['VIN']
+C_RENAULT_BATT = int(config['RENAULT_CAR']['battery'])
+
+C_GIGYA_URL = config['RENAULT_SERVER']['gigya_url']
+C_GIGYA_API_ID = config['RENAULT_SERVER']['gigya_api_id']
+C_KAMERON_URL = config['RENAULT_SERVER']['kameron_url']
+C_KAMERON_API = config['RENAULT_SERVER']['kameron_api']
+
+C_CHARGER_API_VERSION = int(config['CHARGER']['api_version'])
+C_CHARGER_WIFI_URL = config['CHARGER']['wifi_url']
+C_CHARGER_NAME = config['CHARGER']['name']
+C_CHARGER_MIN_CURRENT = int(config['CHARGER']['min_current'])
+C_CHARGER_MAX_CURRENT = int(config['CHARGER']['max_current'])
+C_CHARGER_MAX_POWER = int(config['CHARGER']['max_power'])
+C_SOLAR_URL = config['PV_CONSTANTS']['solar_url']
+C_PV_MIN_REMAIN = float(config['PV_CONSTANTS']['pv_min_remain'])
+
+C_SYS_MIN_PV_HOLD_TIME = int(config['TIMING']['pv_min_hold_time'])
+C_SYS_MIN_PHASE_HOLD_TIME = int(config['TIMING']['phase_min_hold_time'])
+C_SYS_LOG_INTERVAL = int(config['SYSTEM']['log_interval'])
 
 
 C_CAR_STATE = ["Car Unpluged", "Car Ready", "Car Charging"]
@@ -64,7 +68,7 @@ C_SYS_BASE_CLOCK = 1            # seconds
 C_SYS_FORECAST_REQ_TIME = 19    # time of day
 C_SYS_FORECAST_TIME = (14, 1)   # time od day, delta day
 C_SYS_PV_CLOCK = 50             # seconds
-C_SYS_CHARGER_CLOCK = 25        # PV_CLOCK / 2
+C_SYS_CHARGER_CLOCK = 30        # PV_CLOCK / 2
 C_SYS_CAR_CLOCK = 120           # seconds
 
 
