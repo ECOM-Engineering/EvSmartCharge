@@ -29,7 +29,7 @@ class Charger:
         self.timeout = timeout
         if self.api_version == 2:
             self.chargerData = {'car': 0, 'amp': 0, 'frc': 0, 'nrg': 15 * [0], 'fsp': 'true', 'psm': 1,
-                                'wh': 0, 'dwo': 0, 'acs': 0, 'err': -1, 'statusCode': -1}
+                                'wh': 0, 'dwo': 0, 'acs': 0, 'err': -1, 'statusCode': 200}
         else:
             self.chargerData = {'car': 0, 'amp': 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'ast': 1, 'err': -1,
                                 'statusCode': -1}
@@ -82,17 +82,20 @@ class Charger:
         :param value: integer: value to be set
         :return: dictionary . On communication error: -1 or html status
         """
-        value = str(value)
-        if self.api_version == 2:
-            command = self.url + '/api/set?' + param + "=" + value
-        else:
-            command = self.url + '/mqtt?payload=' + param + "=" + value
-        print('\nSetting charger Data', command)
-        try:
-            response = requests.get(command, timeout=self.timeout)
-            status_code = response.status_code
-        except ConnectionError:
-            status_code = -1
+        statusCode = self.chargerData['statusCode']
+        if statusCode == 200:
+            value = str(value)
+            if self.api_version == 2:
+                command = self.url + '/api/set?' + param + "=" + value
+            else:
+                command = self.url + '/mqtt?payload=' + param + "=" + value
+            print('\nSetting charger Data', command)
+            try:
+                response = requests.get(command, timeout=self.timeout)
+                status_code = response.status_code
+            except ConnectionError:
+                status_code = -1
+
         return status_code
 
     def start_charging(self):
