@@ -13,9 +13,10 @@ SIMULATE_PV_TO_GRID = 0
 
 # restore window position
 config = CP.ConfigParser()
+config.read(const.C_INI_FILE)
+
 window = evsGUI.window
 window.finalize()  # activate window
-config.read(const.C_INI_FILE)
 if config.has_option('Window', 'position_xy'):
     win_location = config['Window']['position_xy']
     win_location = eval(win_location)  # re-format to tuple(x,y)
