@@ -62,7 +62,7 @@ class Zoe:
         data = self.loadFromFile("firststep.dta")
         if data is None:
             url = self.gigyaURL + '/accounts.login?loginID=' + encodeURIComponent(self.myRenaultUser) + '&password=' + encodeURIComponent(self.myRenaultPass) + '&include=data&apiKey=' + self.gigyaAPI
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=20)
             print("response step1", response)
             data = response.text
             self.saveToFile(data, "firststep.dta")
