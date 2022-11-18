@@ -1,8 +1,10 @@
 import configparser as CP
 from pathlib import Path
+from os import path as LogPath
 
 projectRoot = str(Path(__file__).parent)
 print("Project Root = ", projectRoot)
+
 
 C_APP_VERSION = '0.9.0rc2'
 configFile = projectRoot + "/evs.cfg"
@@ -16,8 +18,12 @@ try:
 except:
     print("error in config file " + configFile)
 
-# todo if no path given, project root is used
-C_LOG_PATH = projectRoot + '/' + config['SYSTEM']['log_path']
+pathToLogfile, logFile  =  LogPath.split (config['SYSTEM']['log_path'])
+if pathToLogfile == '':
+    C_LOG_PATH = projectRoot + '/' + logFile
+else:
+    C_LOG_PATH = config['SYSTEM']['log_path']
+print("Logfile path: ", C_LOG_PATH)
 
 C_RENAULT_COUNTRY = config['RENAULT_CAR']['country']
 C_RENAULT_USER = config['RENAULT_CAR']['user']
