@@ -38,7 +38,7 @@ ChargeModes = utils.ChargeModes
 chargeMode = ChargeModes.IDLE  # default
 oldChargeMode = None  # used for detection of state transitions
 sysData = utils.SysData
-go_e = utils.charge
+go_e = utils.charge  # get charger object address
 chargeLogTimer = timers.EcTimer()
 
 # initial of module global variables
@@ -137,7 +137,8 @@ while not exitApp:
             window['Stop Charge'].update(disabled=False)
             limit = int(settings['pv']['chargeLimit'])
             sysData.batteryLimit = limit
-            go_e.set_phase(1)
+#           workaround: prevent action before charger is ready
+#            go_e.set_phase(1)
             firstRun = False
 
         limit_pos = int(limit_scale * limit) * ' ' + '▲'
