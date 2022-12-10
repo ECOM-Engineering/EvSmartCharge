@@ -94,9 +94,9 @@ class Charger:
                 response = requests.get(command, timeout=self.timeout)
                 status_code = response.status_code
             except ConnectionError:
-                status_code = -1
+                statusCode = -1
 
-        return status_code
+        return statusCode
 
     def start_charging(self):
         """
