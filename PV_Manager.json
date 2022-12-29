@@ -10,6 +10,5 @@
         "min_3_Ph_current": 8,
         "chargeLimit": 82.0,
         "allow_3_phases": true
-
     }
 }
