@@ -1,6 +1,7 @@
 *.dta
 PV_Manager.json
 Project_Default.xml
+.idea
 __pycache__
 venv
 const.py
