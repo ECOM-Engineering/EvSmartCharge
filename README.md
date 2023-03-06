@@ -1,7 +1,5 @@
 # EV-SmartCharge 'EVS-1'
 
-**This file and project are under construction**
-
 ## Purpose
 
 A smart EV vehicle charging solution using as much of free solar power as available.  
