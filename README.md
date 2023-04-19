@@ -54,4 +54,3 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 ### Manual Charge Settings
 
-![](Images/Popup_ManualSettings.png)
