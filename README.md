@@ -112,5 +112,3 @@ This software may be reused and adapted by respecting the MIT License. This proj
 ![](Images/Popup_PV-Settings.png)
 
 ### Manual Charge Settings
-
->>>>>>> f9f5fded348c1998ba9d18ac81fad890d54b7673
