@@ -1,0 +1,380 @@
+Obtaining car data ...
+response step2 <Response [200]>
+endpoint response: battery-status <Response [200]>
+endpoint response: cockpit <Response [200]>
+Car data: {'statusCode': 200, 'batteryLevel': 48, 'plugStatus': 1, 'clima': '---', 'mileage': 8792, 'location': '---'}
+...........
+Obtaining charger data ...
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [240, 241, 241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': 200, 'apiVer': 2}
+
+Obtaining PV data ...
+{'statusCode': '-1', 'pvPower': 0.0, 'LoadPower': 0.0, 'PowerToGrid': -30}
+.........
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [240, 241, 241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [240, 241, 241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [240, 241, 241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining PV data ...
+{'statusCode': 200, 'pvPower': 0.0, 'LoadPower': 2.01, 'PowerToGrid': -2.01}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [240, 241, 241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': 200, 'apiVer': 2}
+
+Obtaining car data ...
+response step2 <Response [200]>
+endpoint response: battery-status <Response [200]>
+endpoint response: cockpit <Response [200]>
+Car data: {'statusCode': 200, 'batteryLevel': 48, 'plugStatus': 1, 'clima': '---', 'mileage': 8792, 'location': '---'}
+...............
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining PV data ...
+{'statusCode': '-1', 'pvPower': 0.0, 'LoadPower': 0.0, 'PowerToGrid': -30}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining PV data ...
+{'statusCode': '-1', 'pvPower': 0.0, 'LoadPower': 0.0, 'PowerToGrid': -30}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining car data ...
+CONNECTION ERROR!
+Car data: {'statusCode': -1, 'batteryLevel': -1, 'plugStatus': 0, 'clima': '---', 'mileage': 0, 'location': '---'}
+ERROR Reading Car Data, count = 1
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining PV data ...
+{'statusCode': '-1', 'pvPower': 0.0, 'LoadPower': 0.0, 'PowerToGrid': -30}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining PV data ...
+{'statusCode': '-1', 'pvPower': 0.0, 'LoadPower': 0.0, 'PowerToGrid': -30}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.ERROR reading charger, code: -1
+.
+Obtaining charger data ...
+CONNECTION ERROR!
+Charger Data: {'car': 4, 'amp': 7, 'frc': 1, 'nrg': [241, 241, 242, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'fsp': True, 'psm': 1, 'wh': 1207.045, 'dwo': None, 'acs': 1, 'err': 0, 'statusCode': -1, 'apiVer': 2}
+
+Obtaining car data ...
+CONNECTION ERROR!
+Car data: {'statusCode': -1, 'batteryLevel': -1, 'plugStatus': 0, 'clima': '---', 'mileage': 0, 'location': '---'}
+ERROR Reading Car Data, count = 2
+Traceback (most recent call last):
+  File "/home/pi/Projects/EvSmartCharge/mainControl.py", line 122, in <module>
+    chargeMode = utils.evalChargeMode(chargeMode, sysData, settings)
+  File "/home/pi/Projects/EvSmartCharge/utils.py", line 321, in evalChargeMode
+    charge.stop_charging()
+  File "/home/pi/Projects/EvSmartCharge/charger.py", line 129, in stop_charging
+    status_code = self.__set_charger_param('frc', 1)
+  File "/home/pi/Projects/EvSmartCharge/charger.py", line 99, in __set_charger_param
+    return status_code
+UnboundLocalError: local variable 'status_code' referenced before assignment

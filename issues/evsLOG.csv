@@ -1,0 +1,50 @@
+Date,Time,CarState,Actual Mode,Message,BattLevel,Batt Limit,Pwr2Grid,Charge Power,Phases,Charge Active
+,,,,,,,,,,
+2022-05-11,08:47:02,---,1,Power ON ,0,0,0,0,0,False
+2022-05-11,08:47:07,---,1,"IDLE, waiting for event ... ",66,88,1.6,0,1,False
+2022-05-11,08:55:24,Car ready,3,SOLAR CHARGE active ,66,80,1.8,0,1,False
+2022-05-11,08:55:43,CAR CHARGING,3,SOLAR CHARGE active ,66,80,1.8,1.48,1,True
+2022-05-11,09:04:44,CAR CHARGING,1,"IDLE, waiting for event ... ",66,80,-0.1,1.46,1,True
+2022-05-11,09:06:47,Car ready,3,SOLAR CHARGE active ,66,80,1.9,0,1,False
+2022-05-11,09:07:07,CAR CHARGING,3,SOLAR CHARGE active ,66,80,1.9,1.48,1,True
+2022-05-11,09:07:51,CAR CHARGING,1,"IDLE, waiting for event ... ",66,80,0,1.5,1,True
+2022-05-11,09:09:57,Car ready,3,SOLAR CHARGE active ,67,80,2.2,0,1,False
+2022-05-11,09:10:56,Car ready,1,"IDLE, waiting for event ... ",67,80,-0.1,1.77,1,True
+2022-05-11,09:13:00,Car ready,3,SOLAR CHARGE active ,67,80,2,0,1,False
+2022-05-11,09:17:09,Car ready,1,"IDLE, waiting for event ... ",67,80,-0.1,1.69,1,True
+2022-05-11,09:17:09,CAR CHARGING,1,"IDLE, waiting for event ... ",67,80,-0.1,1.69,1,True
+2022-05-11,09:18:14,Car ready,3,SOLAR CHARGE active ,67,80,2.3,0,1,False
+2022-05-11,09:27:09,CAR CHARGING,3,SOLAR CHARGE active ,67,80,0.4,2.04,1,True
+2022-05-11,09:28:17,CAR CHARGING,3,User Exit App,67,80,0.4,2.07,1,True
+2022-05-11,09:28:47,---,1,Power ON ,0,0,0,0,0,False
+2022-05-11,09:28:52,---,1,"IDLE, waiting for event ... ",67,80,2.4,0,1,False
+2022-05-11,09:32:11,---,1,Power ON ,0,0,0,0,0,False
+2022-05-11,09:32:16,---,1,"IDLE, waiting for event ... ",67,80,2.4,0,1,False
+2022-05-11,09:33:16,Car ready,3,SOLAR CHARGE active ,67,80,2.5,0,1,False
+2022-05-11,09:33:35,CAR CHARGING,3,SOLAR CHARGE active ,67,80,2.5,1.96,1,True
+2022-05-11,09:43:36,CAR CHARGING,3,SOLAR CHARGE active ,68,80,0.2,2.31,1,True
+2022-05-11,09:53:37,CAR CHARGING,3,SOLAR CHARGE active ,68,80,0.3,2.47,1,True
+2022-05-11,10:03:37,CAR CHARGING,3,SOLAR CHARGE active ,69,80,0.4,2.69,1,True
+2022-05-11,10:05:31,CAR CHARGING,3,User Exit App,69,80,0.4,2.71,1,True
+2022-05-11,10:05:45,---,1,Power ON ,0,0,0,0,0,False
+2022-05-11,10:05:50,---,1,"IDLE, waiting for event ... ",69,80,3.1,0,1,False
+2022-05-11,10:06:50,Car ready,3,SOLAR CHARGE active ,69,80,3.1,0,1,False
+2022-05-11,10:07:10,CAR CHARGING,3,SOLAR CHARGE active ,69,80,3.1,2.66,1,True
+2022-05-11,10:17:10,CAR CHARGING,3,SOLAR CHARGE active ,70,80,0.4,2.75,1,True
+2022-05-11,10:27:11,CAR CHARGING,3,SOLAR CHARGE active ,71,80,0.2,2.51,1,True
+2022-05-11,10:37:12,CAR CHARGING,3,SOLAR CHARGE active ,72,80,0.5,3.11,1,True
+2022-05-11,10:47:12,CAR CHARGING,3,SOLAR CHARGE active ,72,80,0.7,3.16,1,True
+2022-05-11,10:47:57,CAR CHARGING,10,ERROR on charger ,73,80,0.7,3.16,1,True
+2022-05-11,10:56:51,CAR CHARGING,1,"IDLE, waiting for event ... ",73,80,0.5,3.11,1,True
+2022-05-11,10:57:12,CAR CHARGING,1,"IDLE, waiting for event ... ",74,80,0.5,3.18,1,True
+2022-05-11,11:07:13,CAR CHARGING,1,"IDLE, waiting for event ... ",74,80,0.9,3.12,1,True
+2022-05-11,11:14:16,Car ready,10,ERROR on charger ,75,80,1,3.12,1,True
+2022-05-11,11:15:52,Car ready,1,"IDLE, waiting for event ... ",75,80,0,3.09,1,True
+2022-05-11,11:17:13,CAR CHARGING,1,"IDLE, waiting for event ... ",75,80,0.1,3.15,1,True
+2022-05-11,11:27:14,CAR CHARGING,1,"IDLE, waiting for event ... ",76,80,0.5,3.1,1,True
+2022-05-11,11:37:14,CAR CHARGING,1,"IDLE, waiting for event ... ",77,80,0,3.07,1,True
+2022-05-11,11:47:16,CAR CHARGING,1,"IDLE, waiting for event ... ",78,80,1.5,3.16,1,True
+2022-05-11,11:57:16,CAR CHARGING,1,"IDLE, waiting for event ... ",79,80,1.6,3.06,1,True
+2022-05-11,12:07:16,CAR CHARGING,1,"IDLE, waiting for event ... ",80,80,1.7,3.05,1,True
+2022-05-11,12:17:17,CAR CHARGING,1,"IDLE, waiting for event ... ",80,85,1.7,3.14,1,True
+2022-05-11,12:20:44,Car ready,1,User Exit App,81,85,1.6,3.13,1,True

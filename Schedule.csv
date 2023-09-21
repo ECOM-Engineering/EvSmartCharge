@@ -1,0 +1,5 @@
+Day [1 … 7],From [hh:mm:ss],To [hh:mm:ss],Retry[min],Job
+0,12:00,14:30,8,0:HP_CHECK_ACTIVATION
+0,17:00,17:30,0,1:HP_RESET
+0,18:00,18:59,9,2:HP_GET_FORECAST
+0,00:00,23:59,10,3:HP_LOG

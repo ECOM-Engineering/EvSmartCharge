@@ -3,7 +3,6 @@ import urllib.parse
 import json
 import const
 
-
 # 'FR' replaced by 'CH' (Switzerland
 # File Operations partly removed
 

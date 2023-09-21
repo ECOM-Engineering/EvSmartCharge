@@ -4,7 +4,7 @@
 [SYSTEM]
 ;log intervall during charging process
 log_interval = 600
-; if no path to the file given, project root is used
+; if no path to the file given, project roor is used
 log_path = evsLOG.csv
 
 [RENAULT_CAR]
@@ -20,10 +20,7 @@ Battery = 52
 gigya_url = https://accounts.eu1.gigya.com
 gigya_api_id = 3_UyiWZs_1UXYCUqK_1n7l7l44UiI_9N9hqwtREV0-UYA_5X7tOV-VKvnGxPBww4q2
 kameron_url = https://api-wired-prod-1-euw1.wrd-aws.com
-;kameron_api = VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss
-;Thanks to https://gist.github.com/mountbatt/772e4512089802a2aa2622058dd1ded7/revisions
-kameron_api = YjkKtHmGfaceeuExUDKGxrLZGGvtVS0J
-
+kameron_api = VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss
 
 [CHARGER]
 ; refer to serial number of go-eCharger CM-02: api version 1, CM-03: api version 2
@@ -45,7 +42,7 @@ pv_min_remain = 0.1
 
 [TIMING]
 ; prevent rapid switching, values in seconds
-pv_min_hold_time = 300
+pv_min_hold_time = 180
 phase_min_hold_time = 90
 
 
