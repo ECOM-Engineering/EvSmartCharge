@@ -38,7 +38,7 @@ ChargeModes = utils.ChargeModes
 chargeMode = ChargeModes.IDLE  # default
 oldChargeMode = None  # used for detection of state transitions
 sysData = utils.SysData
-go_e = utils.charge  # get charger object address
+
 chargeLogTimer = timers.EcTimer()
 
 # initial of module global variables
@@ -70,7 +70,11 @@ def printMsg(item="", value=""):
     return text
 
 
-messageTxt = printMsg('Power ON')
+messageTxt = printMsg('Power ON, searching charger')
+utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
+go_e = utils.charge  # get charger object
+messageTxt = printMsg('found charger', go_e.url )
+
 utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
 go_e.stop_charging()
 

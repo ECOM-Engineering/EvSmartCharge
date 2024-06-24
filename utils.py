@@ -94,7 +94,8 @@ def processChargerData(sysData=SysData):
         else:  # API V2
             sysData.chargePower = chargerData['nrg'][11] / 1000  # original value is in W
             sysData.actPhases = chargerData['psm']
-            sysData.currentL1 = chargerData['nrg'][4]  # original value is in 1A
+            f_current = "{:.1f}".format(chargerData['nrg'][4] ) # original value is float in 1A
+            sysData.currentL1 = f_current  # 2 decimal digits
             if chargerData['frc'] == 2:
                 sysData.chargeActive = True  # True while charging
             else:
@@ -229,7 +230,8 @@ def evalChargeMode(chargeMode, sysData, settings):
 
         #### charge end ctriteria
         if sysData.batteryLevel >= sysData.batteryLimit \
-                or sysData.calcPvCurrent_1P < const.C_CHARGER_MIN_CURRENT:
+                or sysData.calcPvCurrent_1P < const.C_CHARGER_MIN_CURRENT \
+                or new_chargeMode == ChargeModes.UNPLUGGED:
             charge.stop_charging()
             charge.set_phase(const.C_CHARGER_1_PHASE)
             sysData.chargeActive = False

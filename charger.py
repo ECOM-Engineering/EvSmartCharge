@@ -13,7 +13,7 @@ import const
 class Charger:
     url = ''
 
-    def __init__(self, url, api_version=2, timeout=15):
+    def __init__(self, url_root, api_version=2, timeout=15):
         """
         ini function at instantiation of this class 
 
@@ -21,8 +21,11 @@ class Charger:
         :param api_version: API version (series CM-02: 1, series CM-03: 2)
         :param timeout:     optional seconds. Default = 15
         """
-        if url is None or url == '':
+        if url_root is None or url_root == '':
             raise ValueError("Please set charger url")
+
+        url = search_charger(url_root)
+
 
         self.url = url
         self.api_version = api_version
@@ -169,11 +172,31 @@ class Charger:
 
 
 # test
+
+def search_charger(ip_root, tout = 0.2):
+    retval = "-1"
+    command = "/api/status"
+    for i in range(1, 250):
+        ip = ip_root + str(i)
+        try:
+            response = requests.get(ip + command, timeout=(tout, 2))
+            statusCode = response.status_code
+            if statusCode == 200:
+                print("IP found:", ip)
+                retval = ip
+                break
+        except:
+            continue
+
+    return retval
+
 if __name__ == "__main__":
     # go = Charger("http://192.168.0.30", 2)
     #    go = Charger("http://192.168.0.11", 1)
 
-    go = Charger(const.C_CHARGER_WIFI_URL, 2)
+    charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
+
+    go = Charger(charger_ip, 2)
 
     status = go.set_current(7)
     print('set_current() status =', status)
