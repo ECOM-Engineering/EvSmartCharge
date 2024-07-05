@@ -211,14 +211,9 @@ if __name__ == "__main__":
     # go = Charger("http://192.168.0.30", 2)
     #    go = Charger("http://192.168.0.11", 1)
 
-#    charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
+ #   charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
 
-
-    go = Charger("http://192.168.0.18")
-    if go.url <= "0":
-        url = search_charger("http://192.168.0.")
-  
-    print("url:", go.url)
+    go = Charger(charger_ip, 2)
 
 
 #    status = go.get_charger_data()

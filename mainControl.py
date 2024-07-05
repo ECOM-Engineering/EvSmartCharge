@@ -7,7 +7,16 @@ import popCharge
 import popSettings
 import sysSettings
 import timers
+import charger
+
+# pwrOnTimer = timers.EcTimer()
+# pwrOnTimer.set(2)
+
+# while(pwrOnTimer.read()):
+#     x = 1
+
 import utils
+
 
 SIMULATE_PV_TO_GRID = 0
 
@@ -70,13 +79,14 @@ def printMsg(item="", value=""):
     return text
 
 
+###pend Aufstart Fehler wegen fehlendem window.finalize()???
 messageTxt = printMsg('Power ON, searching charger')
 utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
-go_e = utils.charge  # get charger object
-messageTxt = printMsg('found charger', go_e.url )
+# go_e = utils.charge  # get charger object
+# messageTxt = printMsg('found charger', go_e.url )
 
-utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
-go_e.stop_charging()
+go_e = utils.charge   # get charger object
+# go_e.stop_charging()
 
 # ------------------------------------------------ this is the main control loop -------------------------------------
 while not exitApp:
@@ -135,12 +145,15 @@ while not exitApp:
                 ExecImmediate = True
             forceFlag = False
 
-        # ---------------------------------------- update display elements -------------------------------------------
-        if firstRun:
+                # ---------------------------------------- update display elements -------------------------------------------
+        if firstRun == True:
             window['Force Charge'].update(disabled=False)
             window['Stop Charge'].update(disabled=False)
             limit = int(settings['pv']['chargeLimit'])
             sysData.batteryLimit = limit
+#            charger.search_charger("http://192.168.0.")
+            messageTxt = printMsg('found charger', go_e.url)           
+            utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
 #           workaround: prevent action before charger is ready
 #            go_e.set_phase(1)
             firstRun = False
