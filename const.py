@@ -5,7 +5,7 @@ from os import path as LogPath
 projectRoot = str(Path(__file__).parent)
 print("Project Root = ", projectRoot)
 
-C_APP_VERSION = '0.9.0rc3'
+C_APP_VERSION = '0.9.0rc4'
 configFile = projectRoot + "/evs.cfg"
 C_DEFAULT_SETTINGS_FILE = projectRoot + "/PV_Manager.json"
 C_INI_FILE = projectRoot + "/evsGUI.ini"
@@ -34,7 +34,7 @@ C_KAMERON_URL = config['RENAULT_SERVER']['kameron_url']
 C_KAMERON_API = config['RENAULT_SERVER']['kameron_api']
 
 C_CHARGER_API_VERSION = int(config['CHARGER']['api_version'])
-C_CHARGER_WIFI_URL = config['CHARGER']['wifi_url_root']
+C_CHARGER_WIFI_URL = config['CHARGER']['wifi_url']
 C_CHARGER_NAME = config['CHARGER']['name']
 C_CHARGER_MIN_CURRENT = int(config['CHARGER']['min_current'])
 C_CHARGER_MAX_CURRENT = int(config['CHARGER']['max_current'])

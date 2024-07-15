@@ -9,6 +9,22 @@ from requests import ConnectionError
 # API V2 see: https://github.com/goecharger/go-eCharger-API-v2
 import const
 
+def search_charger(ip_root, tout = 0.2):
+    retval = "-1"
+    command = "/api/status?filter=fna"
+    for i in range(1, 250):
+        ip = ip_root + str(i)
+        print("searching charger on", ip)
+        try:
+            response = requests.get(ip + command, timeout=(tout))
+            statusCode = response.status_code
+            if statusCode == 200:
+                print("IP found:", ip)
+                retval = ip
+                break
+        except:
+            continue
+    return retval
 
 class Charger:
 
@@ -24,6 +40,9 @@ class Charger:
             raise ValueError("Please set charger url")
 
         self.url = url
+#        url = self.__search_charger(self)
+
+#        self.url = url
         self.api_version = api_version
         self.timeout = timeout
         if self.api_version == 2:
@@ -60,9 +79,9 @@ class Charger:
         command = "/status"
         statusCode = -1
         if self.api_version == 2:
-            xfilter = 'filter='
+            xfilter = ''
             for keys in self.chargerData:
-                xfilter = xfilter + keys + ','
+                xfilter = xfilter + ',' + keys
                 command = '/api/status' + '?' + xfilter
 
         try:
@@ -188,16 +207,13 @@ class Charger:
 
 
 
-#if __name__ == "__main__":
-#     # go = Charger("http://192.168.0.30", 2)
-#     #    go = Charger("http://192.168.0.11", 1)
+if __name__ == "__main__":
+    # go = Charger("http://192.168.0.30", 2)
+    #    go = Charger("http://192.168.0.11", 1)
 
-# #    charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
+ #   charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
 
-
-#  go = search_charger("http://192.168.0.")
-#     if go.url > "0":
-#       print("charger not found")
+    go = Charger(charger_ip, 2)
 
 
 #    status = go.get_charger_data()

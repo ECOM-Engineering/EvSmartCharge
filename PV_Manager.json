@@ -8,7 +8,7 @@
     "pv": {
         "max_1_Ph_current": 15,
         "min_3_Ph_current": 8,
-        "chargeLimit": 94.0,
+        "chargeLimit": 97.0,
         "allow_3_phases": true
     }
 }

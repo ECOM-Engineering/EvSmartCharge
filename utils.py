@@ -6,6 +6,7 @@ import timers
 import charger
 import access
 
+charge = None
 # window = evsGUI.window
 # def printMsg(text=''):
 #     window['-MESSAGE-'].update(text)
@@ -14,8 +15,10 @@ import access
 # todo: PV power must remain for x minutes before decision
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
 
-charge = charger.Charger(const.C_CHARGER_WIFI_URL, const.C_CHARGER_API_VERSION)
+###### charger_ip = charger.search_charger(const.C_CHARGER_WIFI_URL)
 
+# charger_ip = "http://192.168.0.19"
+# charge = charger.Charger(charger_ip, const.C_CHARGER_API_VERSION)
 
 class SysData:  # class variables as kind of (global) C structure
     """All data used for signal processing and display."""
@@ -184,7 +187,6 @@ def evalChargeMode(chargeMode, sysData, settings):
     sysData = processChargerData(sysData)
     if sysData.chargerError == 0:
         if not sysData.carPlugged:
-            #            chargeMode = ChargeModes.IDLE
             new_chargeMode = ChargeModes.UNPLUGGED
     else:
         chargeMode = ChargeModes.CHARGER_ERROR  # force error state
