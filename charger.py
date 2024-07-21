@@ -29,6 +29,7 @@ def search_charger(ip_root, tout = 0.2):
 class Charger:
 
     def __init__(self, url, api_version=2, timeout=15):
+    def __init__(self, url, api_version=2, timeout=15):
         """
         ini function at instantiation of this class 
 
@@ -36,6 +37,7 @@ class Charger:
         :param api_version: API version (series CM-02: 1, series CM-03: 2)
         :param timeout:     optional seconds. Default = 15
         """
+        if url is None or url == '':
         if url is None or url == '':
             raise ValueError("Please set charger url")
 
@@ -69,6 +71,23 @@ class Charger:
                 continue
         return retval
 
+    def __search_charger(self, tout=0.5):
+        retval = "-1"
+        command = "/api/status?filter=fna"
+        for i in range(1, 250):
+            ip = self.url_root + str(i)
+            try:
+#                response = requests.get(ip + command, timeout=(tout, 2))
+                response = requests.get(ip + command, timeout = 0.5)
+                statusCode = response.status_code
+                if statusCode == 200:
+                    print("IP found:", ip)
+                    retval = ip
+                    break
+            except:
+                continue
+        return retval
+
     def get_charger_data(self):
         """
         Get relevant data from charger
@@ -79,9 +98,9 @@ class Charger:
         command = "/status"
         statusCode = -1
         if self.api_version == 2:
-            xfilter = ''
+            xfilter = 'filter='
             for keys in self.chargerData:
-                xfilter = xfilter + ',' + keys
+                xfilter = xfilter + keys + ','
                 command = '/api/status' + '?' + xfilter
 
         try:
@@ -211,7 +230,13 @@ if __name__ == "__main__":
     # go = Charger("http://192.168.0.30", 2)
     #    go = Charger("http://192.168.0.11", 1)
 
+
+#if __name__ == "__main__":
+#     # go = Charger("http://192.168.0.30", 2)
+#     #    go = Charger("http://192.168.0.11", 1)
+
 #    charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
+# #    charger_ip = search_charger(const.C_CHARGER_WIFI_URL)
 
 
     go = Charger("http://192.168.0.18")
@@ -226,22 +251,52 @@ if __name__ == "__main__":
 #    status = go.set_current(7)
 #     print('set_current() status =', status)
 
+#  go = search_charger("http://192.168.0.")
+#     if go.url > "0":
+#       print("charger not found")
+
+
+#    status = go.get_charger_data()
+
+#    status = go.set_current(7)
+#     print('set_current() status =', status)
+
+#     status = go.set_phase(1)
+#     print('set_phasestatus e=', status)
 #     status = go.set_phase(1)
 #     print('set_phasestatus e=', status)
 
+#     status = go.start_charging()
+#     print('START status =', status)
 #     status = go.start_charging()
 #     print('START status =', status)
 
 #     wait = 20
 #     print('SLEEPING ... ', wait)
 #     time.sleep(wait)
+#     wait = 20
+#     print('SLEEPING ... ', wait)
+#     time.sleep(wait)
 
+#     status = go.get_charger_data()
+#     print('ecReadChargerData() status =', status)
 #     status = go.get_charger_data()
 #     print('ecReadChargerData() status =', status)
 
 #     status = go.stop_charging()
 #     print('STROP status =', status)
+#     status = go.stop_charging()
+#     print('STROP status =', status)
 
+# #
+# # go = Charger("http://192.168.0.11", 1)
+# # status = go.set_current(8)
+# # print('status =', status)
+# #
+# # status = go.ecReadChargerData()
+# #
+# # status = go.set_phase(1)
+# # print(status)
 # #
 # # go = Charger("http://192.168.0.11", 1)
 # # status = go.set_current(8)
