@@ -1,4 +1,5 @@
-import PySimpleGUI as sg
+# import as sg
+import FreeSimpleGUI as sg
 import const
 
 #todo replace limit text limit sign by graph

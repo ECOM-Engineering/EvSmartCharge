@@ -16,7 +16,7 @@ import access
 
 ###### charger_ip = charger.search_charger(const.C_CHARGER_WIFI_URL)
 
-charger_ip = "http://192.168.0.19"
+charger_ip = const.C_CHARGER_WIFI_URL
 charge = charger.Charger(charger_ip, const.C_CHARGER_API_VERSION)
 
 class SysData:  # class variables as kind of (global) C structure

@@ -79,12 +79,8 @@ def printMsg(item="", value=""):
     return text
 
 
-###pend Aufstart Fehler wegen fehlendem window.finalize()???
 messageTxt = printMsg('Power ON, searching charger')
 utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
-# go_e = utils.charge  # get charger object
-# messageTxt = printMsg('found charger', go_e.url )
-
 go_e = utils.charge   # get charger object
 # go_e.stop_charging()
 
@@ -150,12 +146,8 @@ while not exitApp:
             window['Force Charge'].update(disabled=False)
             window['Stop Charge'].update(disabled=False)
             limit = int(settings['pv']['chargeLimit'])
-            sysData.batteryLimit = limit
-#            charger.search_charger("http://192.168.0.")
             messageTxt = printMsg('found charger', go_e.url)           
             utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
-#           workaround: prevent action before charger is ready
-#            go_e.set_phase(1)
             firstRun = False
 
         limit_pos = int(limit_scale * limit) * ' ' + '▲'

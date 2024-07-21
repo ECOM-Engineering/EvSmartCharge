@@ -1,6 +1,6 @@
 import json
-import PySimpleGUI as sg
-
+# import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 # default
 # defaultSettings = {'manual':{'cancelled': True, 'currentSet': 12, 'chargeLimit': 80, '3_phases': False, 'phaseSet': True},
 #                  'pv': {'currentSet': 8, 'chargeLimit': 80, '3_phases': False}}
