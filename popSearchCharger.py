@@ -1,6 +1,6 @@
 # from typing import Dict, Union
 
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import requests
 x=sg.version
 

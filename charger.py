@@ -29,7 +29,6 @@ def search_charger(ip_root, tout = 0.2):
 class Charger:
 
     def __init__(self, url, api_version=2, timeout=15):
-    def __init__(self, url, api_version=2, timeout=15):
         """
         ini function at instantiation of this class 
 
@@ -37,7 +36,6 @@ class Charger:
         :param api_version: API version (series CM-02: 1, series CM-03: 2)
         :param timeout:     optional seconds. Default = 15
         """
-        if url is None or url == '':
         if url is None or url == '':
             raise ValueError("Please set charger url")
 
