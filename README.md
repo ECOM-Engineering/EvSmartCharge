@@ -32,7 +32,7 @@ EVS-1 uses surplus energy of photovoltaic installations. Depending on solar powe
 
 This software may be reused and adapted by respecting the MIT License. This project is based in parts on other open source projects:
 
-[pyfreegui](https://pysimplegui.readthedocs.io/en/latest/) graphical interface tool
+[FreeSimpleGUI](https://github.com/spyoungtech/FreeSimpleGUI/tree/main) graphical interface tool
 
 [go-eCharger API V2](https://github.com/goecharger/go-eCharger-API-v2)  WLAN or Internet access to the go-eCharger Wallbox  or  or  
 
