@@ -14,7 +14,7 @@ def search_charger(ip_root, tout = 0.2):
     command = "/api/status?filter=fna"
     for i in range(1, 250):
         ip = ip_root + str(i)
-        print("searching charger on", ip)
+        print(ip)
         try:
             response = requests.get(ip + command, timeout=(tout))
             statusCode = response.status_code
@@ -28,7 +28,7 @@ def search_charger(ip_root, tout = 0.2):
 
 class Charger:
 
-    def __init__(self, url, api_version=2, timeout=15):
+    def __init__(self, url, api_version=2, timeout=5):
         """
         ini function at instantiation of this class 
 
@@ -40,9 +40,6 @@ class Charger:
             raise ValueError("Please set charger url")
 
         self.url = url
-#        url = self.__search_charger(self)
-
-#        self.url = url
         self.api_version = api_version
         self.timeout = timeout
         if self.api_version == 2:
@@ -58,7 +55,6 @@ class Charger:
         for i in range(1, 250):
             ip = self.url_root + str(i)
             try:
-#                response = requests.get(ip + command, timeout=(tout, 2))
                 response = requests.get(ip + command, timeout = 0.5)
                 statusCode = response.status_code
                 if statusCode == 200:
@@ -238,10 +234,14 @@ if __name__ == "__main__":
 
 
     go = Charger("http://192.168.0.18")
-    if go.url <= "0":
-        url = search_charger("http://192.168.0.")
-  
     print("url:", go.url)
+    import socket
+    hostname = socket.gethostname()
+    print("hostname:", hostname)
+    ip_address = socket.gethostbyname(hostname)
+    print("IP:", ip_address)
+    
+
 
 
 #    status = go.get_charger_data()

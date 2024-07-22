@@ -11,3 +11,5 @@ Logo
 evsLOG.csv
 evsGUI.ini
 /Tests-Analyse/
+.vscode*
+doc
