@@ -58,6 +58,10 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 ### Adaptive Solar Charge 
 
-![blue = charging current](Images/Solar-Charge-2022-06-10.jpg)
+![](Images/Solar-Charge-2022-06-10.jpg)
 
-![blue = charging current](Images/Solar-Charge-2022-06-11.jpg)
+![](Images/Solar-Charge-2022-06-11.jpg)
+
+
+# Installation
+text follows ...

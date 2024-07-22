@@ -44,22 +44,6 @@ def popSearchCharger():
 
     return foundIP
 
-# def search_charger(ip_root, tout = 0.3):
-#     retval = "-1"
-#     command = "/api/status?filter=fna"
-#     for i in range(1, 250):
-#         ip = ip_root + str(i)
-#         try:
-#             print(ip)
-#             response = requests.get(ip + command, timeout=(tout))
-#             statusCode = response.status_code
-#             if statusCode == 200:
-#                 print("IP found:", ip, end =" ")
-#                 retval = ip
-#                 break
-#         except:
-#             continue
-#     return retval
 
 def find_IP_root():
     hostname = socket.gethostname()
