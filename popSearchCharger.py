@@ -20,7 +20,7 @@ def popSearchCharger():
     ip_root = 'http://' + find_IP_root()
     foundIP = '?'
 
-    layout_popC = [[sg.Text('CHARGER NOT FOUND at!', pad=0), sg.Text(' 2nd Text')],
+    layout_popC = [[sg.Text('SEARCH CHARGER IN LOCAL WIFI NET')],
                    [sg.Text('WiFi root:', size=10), sg.Input(ip_root + 'xxx', size=30, disabled=True )],
                    [sg.Text('Serching at:', size=10),
                     sg.Multiline(key='-ACTUAL_IP-',size=(30,5),no_scrollbar = True, autoscroll = True,
