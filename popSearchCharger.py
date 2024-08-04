@@ -3,6 +3,7 @@
 import FreeSimpleGUI as sg
 import requests
 import socket
+import os
 from charger import search_charger
 x=sg.version
 
@@ -12,12 +13,13 @@ b64Logo=b'iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAACXBIWXMAAA7DAAAOwwHHb6
 def popSearchCharger():
     """ Search based on local wifi ip of the host. """
 
-    find_IP_root()
-    ip_root = 'http://' + find_IP_root()
+    ip_address = 'http://' + find_IP()
+    lastDot = ip_address.rfind('.')
+    ip_root = ip_address[:lastDot + 1 ]
     foundIP = '?'
 
     layout_popC = [[sg.Text('SEARCH CHARGER IN LOCAL WIFI NET')],
-                   [sg.Text('WiFi root:', size=10), sg.Input(ip_root + 'xxx', size=30, disabled=True )],
+                   [sg.Text('WiFi root:', size=10), sg.Input(ip_root, size=30, disabled=True )],
                    [sg.Text('Serching at:', size=10),
                     sg.Multiline(key='-ACTUAL_IP-',size=(30,5),no_scrollbar = True, autoscroll = True,
                                  reroute_stdout = True, write_only = True, auto_refresh = True,background_color='lightgrey')],
@@ -40,7 +42,6 @@ def popSearchCharger():
 
     return foundIP
 
-
 def find_IP_root():
     hostname = socket.gethostname()
     print("hostname:", hostname)
@@ -49,5 +50,19 @@ def find_IP_root():
     lastDot = ip_address.rfind('.')
     ip_root = ip_address[:lastDot + 1 ]
     return ip_root
+
+
+def find_IP():
+    status = os.popen("sudo ifconfig wlan0").read()
+    print("status:", status)
+
+    items = status.split()
+    ip_pos = items.index('inet') + 1
+    ip = items[ip_pos]
+    print("My local wlan IP is:", ip)
+    return(ip)
+
+if __name__ == "__main__":
+    find_IP()
 
 if __name__ == "__main__": popSearchCharger()
