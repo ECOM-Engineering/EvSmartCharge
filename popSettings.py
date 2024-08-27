@@ -1,4 +1,5 @@
-# import PySimpleGUI as sg
+"""Popup window for solar charge settings"""
+
 import FreeSimpleGUI as sg
 import os.path
 
@@ -50,7 +51,6 @@ def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE, pop_locatio
 
     # test global padding    popWin = sg.Window('Manual Charge Options',  layout_popC, element_padding=0)
     popWin = sg.Window('PV Options', layout_popC, location=pop_location, modal=True, icon=const.C_LOGO)
-    #    p = popWin['battLevel']
 
     while True:
         ev2, val2 = popWin.read(100)
@@ -65,11 +65,6 @@ def popSettings(batteryLevel=40, file=const.C_DEFAULT_SETTINGS_FILE, pop_locatio
             pvSettings['chargeLimit'] = val2['-CHARGE LIMIT-']
             done = True
             break
-
-        #        if ev2 == '-CHARGE LIMIT-':  # prevent limit lower than actuaöl battery level
-        #            if val2['-CHARGE LIMIT-'] < batteryLevel:
-        #                popWin['-CHARGE LIMIT-'].update(batteryLevel)
-        #    print(manualSettings)
 
         # noinspection PySimplifyBooleanCheck
         if val2['-allow_3_phases-'] == True:

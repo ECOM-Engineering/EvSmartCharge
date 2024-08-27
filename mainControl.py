@@ -1,3 +1,5 @@
+""" Main control and display module."""
+
 import configparser as CP
 import os.path
 
@@ -9,15 +11,6 @@ import sysSettings
 import timers
 import charger
 import utils
-
-
-# pwrOnTimer = timers.EcTimer()
-# pwrOnTimer.set(2)
-
-# while(pwrOnTimer.read()):
-#     x = 1
-
-
 
 SIMULATE_PV_TO_GRID = 0
 
@@ -73,8 +66,14 @@ else:
     settings = sysSettings.defaultSettings
     sysSettings.writeSettings(const.C_DEFAULT_SETTINGS_FILE, settings)
 
-
 def printMsg(item="", value=""):
+    """
+    Write message into message window and return message.
+
+    :param item: First text in message
+    :param value: optional values to display
+    :return: composed text
+    """
     text = f'{item} {value}'
     window['-MESSAGE-'].update(text)
     return text
@@ -83,7 +82,6 @@ messageTxt = printMsg('Power ON')
 messageTxt = printMsg('Charger on URL', const.C_CHARGER_WIFI_URL)
 
 go_e = charger.Charger(url= const.C_CHARGER_WIFI_URL)
-utils.charge = go_e  #forward object go-e to utils.py
 
 utils.writeLog(sysData, strMessage=messageTxt, strMode=chargeMode)
 

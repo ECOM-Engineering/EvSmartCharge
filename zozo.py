@@ -1,3 +1,8 @@
+"""High level API based on 'Renault API'
+
+    Uses Renault  https://renault-api.readthedocs.io/en/latest/endpoints.html
+"""
+
 import requests
 import urllib.parse
 import json
@@ -6,7 +11,7 @@ import const
 # 'FR' replaced by 'CH' (Switzerland
 # File Operations partly removed
 
-# API Referemce  https://renault-api.readthedocs.io/en/latest/endpoints.html
+
 
 def encodeURIComponent(s):
     return urllib.parse.quote(s)
@@ -45,16 +50,6 @@ class Zoe:
         with open(filename, "w") as f:
             f.write(data)
 
-    # def cleanPersonnalInfo(self):
-    #     if os.path.exists("firststep.dta"):
-    #         os.remove("firststep.dta")
-    #     if os.path.exists("secondstep.dta"):
-    #         os.remove("secondstep.dta")
-    #     if os.path.exists("thirdstep.dta"):
-    #         os.remove("thirdstep.dta")
-    #     if os.path.exists("fourstep.dta"):
-    #         os.remove("fourstep.dta")
-
     def getPersonalInfo(self):
         # Save the result to a file, to avoid being annoyed by renault server quota limits.
         data = None
@@ -92,15 +87,6 @@ class Zoe:
 
         #Save the result to a file, to avoid being annoyed by renault server quota limits.
         data = None
-#        data = self.loadFromFile("fourstep.dta")
-#        if data is None:
-#             url = self.kamareonURL + '/commerce/v1/accounts/' + self.account_id + '/vehicles?country=CH'
-#             headers = {"x-gigya-id_token": self.gigyaJWTToken, "apikey": self.kamareonAPI}
-#             response = requests.get(url, headers=headers, timeout=10)
-#             print("response step4", response)
-#             data = response.text
-#             self.saveToFile(data, "fourstep.dta")
- #       self.VIN = json.loads(data)["vehicleLinks"][0]["vin"]
         self.VIN = const.C_RENAULT_VIN
 
     def batteryStatus(self):

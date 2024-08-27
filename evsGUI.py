@@ -1,8 +1,9 @@
-# import as sg
+"""Graphical user interface based on FreeSimpleGUI( formar PySimpleGUI)."""
+
 import FreeSimpleGUI as sg
 import const
 
-#todo replace limit text limit sign by graph
+
 #sg.theme('DarkBlue3')
 #sg.theme('SystemDefault')
 #sg.theme("SystemDefaultForReal")
@@ -33,6 +34,13 @@ limitText = sg.Text(0, size=(3, 1), pad=(0, 0), justification='right', enable_ev
 
 
 def LEDIndicator(key=None, radius=30):
+    """
+    LED widget built as circle.
+
+    :param key: label of selected LED
+    :param radius: LED radius in pixels
+    :return: LED
+    """
     return sg.Graph(canvas_size=(radius, radius),
                     graph_bottom_left=(-radius, -radius),
                     graph_top_right=(radius, radius),
@@ -40,6 +48,14 @@ def LEDIndicator(key=None, radius=30):
 
 
 def SetLED(win, key, color):
+    """
+    Display Activate LED widget
+
+    :param win: parent window
+    :param key: label of selected LED
+    :param color: color of selected LED
+    :return: none
+    """
     graph = win[key]
     graph.erase()
     graph.draw_circle((0, 0), 12, fill_color=color, line_color='black')
@@ -58,10 +74,8 @@ col1 =  [
           sg.Stretch(), LEDIndicator('-LED_CAR-')],
          [limitSign,
           limitText, sg.Text('%', pad=0)]])
-#         [))]])
          ],
         [sg.Text("")],
-
         [sg.Frame(title='Charging Power', size=(530,80), layout=[
         [chargePwrBar, chargeDisp, sg.Text('kW', pad=0), chargeCurrentDisp, sg.Text('A', pad=0), phasesDisp, sg.Text('Phase'),
          sg.Stretch(), LEDIndicator('-LED_CHARGER-') ],
@@ -77,7 +91,6 @@ col1 =  [
 
         [sg.Frame(title='Messages', size=(530,60), layout=[
         [messageText, sg.Stretch(), LEDIndicator('-LED_MSG-')]])]]
-#       [sg.Text('Initializing ...', key='-MESSAGE-', size=53, text_color ='grey10', background_color ='light grey')]])]]
 
 layout = [[sg.Column(col1)],
           [sg.Button('Force Charge', disabled=True), sg.Button('Stop Charge', disabled=True),
@@ -89,12 +102,14 @@ window = sg.Window('ECOM EVS-1 Smart Solar Charging V' + const.C_APP_VERSION, la
 
 
 def testLayout():
+    """Displays main window (static)."""
+
     while 1:
         event, values = window.read(timeout=200)
         if event == 'Quit' or event == sg.WIN_CLOSED:
             quit()
         window['-battBar-'].UpdateBar(50)
-        SetLED(window,'-LED_SOLAR-', 'grey')
+        SetLED(window,'-LED_SOLAR-', 'yellow')
         SetLED(window,'-LED_FORCED-', 'grey')
         SetLED(window,'-LED_EXTERN-', 'grey')
         SetLED(window,'-LED_MSG-', 'grey')

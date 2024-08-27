@@ -1,3 +1,5 @@
+"""High level API for charging procedures."""
+
 import os
 from datetime import datetime
 import csv
@@ -6,7 +8,6 @@ import timers
 import charger
 import access
 
-charge = None
 # window = evsGUI.window
 # def printMsg(text=''):
 #     window['-MESSAGE-'].update(text)
@@ -15,10 +16,8 @@ charge = None
 # todo: PV power must remain for x minutes before decision
 # todo: night charging solution (charge < x%; manual intervention via remotecontrol ...)
 
-###### charger_ip = charger.search_charger(const.C_CHARGER_WIFI_URL)
-###### charger_ip = charger.search_charger(const.C_CHARGER_WIFI_URL)
 
-charger_ip = const.C_CHARGER_WIFI_URL
+charger_ip = const.C_CHARGER_WIFI_URL  # TODO automatic search charger
 charge = charger.Charger(charger_ip, const.C_CHARGER_API_VERSION)
 
 class SysData:  # class variables as kind of (global) C structure
@@ -48,7 +47,7 @@ class SysData:  # class variables as kind of (global) C structure
     scanTimer = timers.EcTimer()
     pvScanTimer = timers.EcTimer()
     carScanTimer = timers.EcTimer()
-    carErrorCounter = 0  # increment if eror during car data read
+    carErrorCounter = 0  # increment if error during car data read
     pvError = 0
     chargerError = 0
 
@@ -71,7 +70,8 @@ class ChargeModes:  # kind of enum
 
 def processChargerData(sysData=SysData):
     """
-    Converts charger data into sysData format
+    Converts charger data into sysData format.
+
     :param sysData: data record similar to C structure
     :return: updated sysData
     """
@@ -90,7 +90,7 @@ def processChargerData(sysData=SysData):
         sysData.carPlugged = True
         if sysData.chargerAPIversion == 1:
             sysData.chargePower = chargerData['nrg'][11] / 100  # original value is in 10W
-            sysData.currentL1 = chargerData['nrg'][4] / 10  # original alue is in 0.1A
+            sysData.currentL1 = chargerData['nrg'][4] / 10  # original value is in 0.1A
             if chargerData['nrg'][4] > 10:
                 sysData.chargeActive = True
             else:
@@ -125,9 +125,9 @@ def calcChargeCurrent(sysData, chargeMode, maxCurrent_1P, minCurrent_3P):
      Calculate optimal charge current depending on solar power
 
     :param sysData:         data record similar to C structure
-    :param chargeMode:
+    :param chargeMode:      constant from class ChargeModes
     :param maxCurrent_1P:   [A] upper limit for 1 phase
-    :param minCurrent_3P:   [A] minimum used for switch overr to 3 phases
+    :param minCurrent_3P:   [A] minimum used for switch over to 3 phases
     :return sysData:        updatad data record
     """
 
@@ -231,7 +231,7 @@ def evalChargeMode(chargeMode, sysData, settings):
         else:
             new_chargeMode = ChargeModes.UNPLUGGED
 
-        #### charge end ctriteria
+        #### charge end criteria
         if sysData.batteryLevel >= sysData.batteryLimit \
                 or sysData.calcPvCurrent_1P < const.C_CHARGER_MIN_CURRENT \
                 or new_chargeMode == ChargeModes.UNPLUGGED:
@@ -307,7 +307,7 @@ def evalChargeMode(chargeMode, sysData, settings):
 
     elif chargeMode == ChargeModes.EXTERN:
         if sysData.chargePower < 1:
-            charge.stop_charging(authenticate=1)  # dispite external stop, restore authenticate
+            charge.stop_charging(authenticate=1)  # despite external stop, restore authenticate
             new_chargeMode = ChargeModes.IDLE
 
     elif chargeMode == ChargeModes.UNPLUGGED:
@@ -335,12 +335,12 @@ def evalChargeMode(chargeMode, sysData, settings):
 
 def writeLog(sysData, strMessage="", strMode="", logpath=const.C_LOG_PATH):
     """
-    Write logfile on event or mode change
+    Write logfile on event or mode change.
 
     :param strMode:
-    :param strMessage:
-    :param sysData: object of class SysData
-    :param logpath: full path including filew nane
+    :param strMessage: free text
+    :param sysData: instance of class SysData
+    :param logpath: full path including file nane
     :return: characters written
     """
 
