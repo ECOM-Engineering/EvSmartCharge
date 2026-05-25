@@ -210,7 +210,7 @@ def evalChargeMode(chargeMode, sysData, settings):
     #### Read Solar data and charge decision
     if sysData.pvScanTimer.read() == 0:
         sysData.pvScanTimer.set(const.C_SYS_PV_CLOCK)
-        pvData = access.ec_GetPVData(tout=20)
+        pvData = access.ec_GetPVData(tout=5)
         if pvData['statusCode'] == 200:
             sysData.pvError = 0
             sysData.pvToGrid = round(pvData['PowerToGrid'], 1)
@@ -223,7 +223,8 @@ def evalChargeMode(chargeMode, sysData, settings):
                         if sysData.batteryLevel < sysData.batteryLimit:
                             chargeMode = ChargeModes.PV_EXEC  # set new state
         else:
-            sysData.pvError = sysData.pvError + 1
+            # sysData.pvError = sysData.pvError + 1  ## todo: retry! 
+            print("PV Server Error:", pvData['statusCode'] )
 
     if chargeMode == ChargeModes.PV_EXEC:
         if sysData.carPlugged:
@@ -314,7 +315,8 @@ def evalChargeMode(chargeMode, sysData, settings):
         if sysData.carPlugged:
             new_chargeMode = ChargeModes.IDLE
 
-    if sysData.pvError >= 2:  # continue charging with old data below this limit
+    if sysData.pvError >= 3:  # continue charging with old data below this limit
+        sysData.pvError = 0 
         if chargeMode == ChargeModes.PV_EXEC:
             charge.stop_charging()
             new_chargeMode = ChargeModes.IDLE

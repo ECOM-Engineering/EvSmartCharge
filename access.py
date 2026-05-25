@@ -113,8 +113,12 @@ def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
             pvData['LoadPower'] = jsondata['LOAD']['currentPower']
             #            pvData['PowerToGrid'] = jsondata['GRID']['currentPower']
             pvData['PowerToGrid'] = pvData['pvPower'] - pvData['LoadPower']
+        else:
+           print("Error", pvData['statusCode'])  ## for debug purposes     
     except ConnectionError:
-        pvData['statusCode'] = "-1"
+        print("Error", pvData['statusCode'])  ## for debug purposes
+#        pvData['statusCode'] = "-1"
+     
 
     print(pvData)
     return pvData

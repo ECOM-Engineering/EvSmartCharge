@@ -43,6 +43,12 @@ def popSearchCharger():
     return foundIP
 
 def find_IP_root():
+    """
+    Does not work on raspberry (missing DNS).
+
+    delivers raspberry localhost address only
+    """
+    
     hostname = socket.gethostname()
     print("hostname:", hostname)
     ip_address = socket.gethostbyname(hostname)
@@ -53,6 +59,11 @@ def find_IP_root():
 
 
 def find_IP():
+    """Find IP of the host of this script. 
+    
+    Function uses system commands in order to get the IP address in the current WLAN
+
+    """
     status = os.popen("sudo ifconfig wlan0").read()
     print("status:", status)
 
@@ -62,7 +73,7 @@ def find_IP():
     print("My local wlan IP is:", ip)
     return(ip)
 
-if __name__ == "__main__":
-    find_IP()
+# if __name__ == "__main__":
+#   find_IP()
 
 if __name__ == "__main__": popSearchCharger()

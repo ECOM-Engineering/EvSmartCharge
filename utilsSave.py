@@ -302,7 +302,7 @@ def evalChargeMode(chargeMode, sysData, settings):
             new_chargeMode = ChargeModes.IDLE
 
 
-    if sysData.pvError  >= 2: # continue charging with old data below this limit
+    if sysData.pvError  >= 3: # continue charging with old data below this limit
         if chargeMode == ChargeModes.PV_EXEC:
             charge.stop_charging()
             new_chargeMode = ChargeModes.IDLE
