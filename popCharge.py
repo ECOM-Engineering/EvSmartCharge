@@ -1,4 +1,5 @@
-# import PySimpleGUI as sg
+"""Popup window for manual basic charge settings"""
+
 import FreeSimpleGUI as sg
 import os.path
 import const

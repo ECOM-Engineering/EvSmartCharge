@@ -1,3 +1,5 @@
+"""Cloud access for weather and car data."""
+
 from requests import ConnectionError
 import requests
 import json
@@ -95,7 +97,9 @@ def ec_GetCarData():
 # noinspection PyPep8
 def ec_GetPVData(url=const.C_SOLAR_URL, tout=15):
     """
-    Get relevant data from PV inverter. API doc: https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf
+    Get relevant data from PV inverter.
+
+    API doc: https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf
 
     :param tout: timeout for url access
     :param url: complete url including api key

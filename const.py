@@ -1,3 +1,8 @@
+""" Project wide constants.
+
+project wide constants defined here and in also from evs.cfg file.
+"""
+
 import configparser as CP
 from pathlib import Path
 from os import path as LogPath
@@ -5,7 +10,7 @@ from os import path as LogPath
 projectRoot = str(Path(__file__).parent)
 print("Project Root = ", projectRoot)
 
-C_APP_VERSION = '0.9.0rc4'
+C_APP_VERSION = '0.9.0rc5'
 configFile = projectRoot + "/evs.cfg"
 C_DEFAULT_SETTINGS_FILE = projectRoot + "/PV_Manager.json"
 C_INI_FILE = projectRoot + "/evsGUI.ini"
@@ -47,8 +52,7 @@ C_SYS_MIN_PHASE_HOLD_TIME = int(config['TIMING']['phase_min_hold_time'])
 C_SYS_LOG_INTERVAL = int(config['SYSTEM']['log_interval'])
 
 C_CAR_STATE = ["Car Unpluged", "Car Ready", "Car Charging"]
-C_CHARGER_STATUS_TEXT = ("0:Error", "1: Idle", "2: Charging", "3: WaitCar", "4: Completeç, 5: Error")
-# C_CHARGER_STATUS_TEXT = ("No Charger access", "Vehicle unplugged", "Charging", "Awaiting command", "Ready")
+C_CHARGER_STATUS_TEXT = ("0: imError", "1: Idle", "2: Charging", "3: WaitCar", "4: Completeç, 5: Error")
 C_MODE_TXT = ["CAR UNPLUGGED",
               "IDLE, waiting for event ...",
               "SOLAR CHARGE init ...",
@@ -90,5 +94,5 @@ C_LOGO = b'iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAACXBIWXMAAA7DAAAOwwHHb
           7wdW741898y57yc2ia4ceOFeLTvnYZfsuesm1Q78WfQL9W3SKY3kyi04NP7BTWnQBTm9xRI24kp3nz9If3278UQPZrKUAAAAASUVORK5CYII='
 
 # ----------------  Weather constants (not used yet) -----------------------------
-# C_WEATHER_URL = "https://api.openweathermap.org/data/2.5/forecast?q=arbon,ch&&units=metric&APPID="
-# C_WEATHER_API_KEY = "e00176e559c6b27d5df2fe21d8cd26e0"
+C_WEATHER_URL = ""
+C_WEATHER_API_KEY = ""

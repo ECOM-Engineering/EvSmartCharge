@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+""" Basic library for accessing go-e charger API. """
 
-import time
 from json import JSONDecodeError
 import requests
 from requests import ConnectionError
@@ -9,22 +9,6 @@ from requests import ConnectionError
 # API V2 see: https://github.com/goecharger/go-eCharger-API-v2
 import const
 
-def search_charger(ip_root, tout = 0.2):
-    retval = "-1"
-    command = "/api/status?filter=fna"
-    for i in range(1, 250):
-        ip = ip_root + str(i)
-        print(ip)
-        try:
-            response = requests.get(ip + command, timeout=(tout))
-            statusCode = response.status_code
-            if statusCode == 200:
-                print("IP found:", ip)
-                retval = ip
-                break
-        except:
-            continue
-    return retval
 
 class Charger:
 
@@ -32,7 +16,7 @@ class Charger:
         """
         ini function at instantiation of this class 
 
-        :param url:         WiFi or cloud url of charger
+        :param url:         Wi-Fi or cloud url of charger
         :param api_version: API version (series CM-02: 1, series CM-03: 2)
         :param timeout:     optional seconds. Default = 15
         """
@@ -49,38 +33,21 @@ class Charger:
             self.chargerData = {'car': 0, 'amp': 0, 'nrg': 15 * [0], 'pha': 0, 'dwo': 0, 'ast': 1, 'err': -1,
                                 'statusCode': -1}
 
-    def __search_charger(self, tout=0.5):
-        retval = "-1"
-        command = "/api/status?filter=fna"
-        for i in range(1, 250):
-            ip = self.url_root + str(i)
-            try:
-                response = requests.get(ip + command, timeout = 0.5)
-                statusCode = response.status_code
-                if statusCode == 200:
-                    print("IP found:", ip)
-                    retval = ip
-                    break
-            except:
-                continue
-        return retval
-
-    def __search_charger(self, tout=0.5):
-        retval = "-1"
-        command = "/api/status?filter=fna"
-        for i in range(1, 250):
-            ip = self.url_root + str(i)
-            try:
-#                response = requests.get(ip + command, timeout=(tout, 2))
-                response = requests.get(ip + command, timeout = 0.5)
-                statusCode = response.status_code
-                if statusCode == 200:
-                    print("IP found:", ip)
-                    retval = ip
-                    break
-            except:
-                continue
-        return retval
+    # def __search_charger(self, tout=0.5):
+    #     retval = "-1"
+    #     command = "/api/status?filter=fna"
+    #     for i in range(1, 250):
+    #         ip = self.url_root + str(i)
+    #         try:
+    #             response = requests.get(ip + command, timeout = 0.5)
+    #             statusCode = response.status_code
+    #             if statusCode == 200:
+    #                 print("IP found:", ip)
+    #                 retval = ip
+    #                 break
+    #         except:
+    #             continue
+    #     return retval
 
     def get_charger_data(self):
         """
