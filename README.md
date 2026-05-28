@@ -11,7 +11,7 @@ This solution uses the awsome  [go-eCharger](https://go-e.co/)
 
 Default configuration:
 
-- [Renault ZOE](https://de.renault.ch/elektroautos/renault-zoe.html) Version from 2020++
+- [Renault ZOE](https://de.renault.ch/elektroautos/renault-zoe.html) Version from 2020++ or newer Renault etech cars (R4, R5 and more)
 
 - [go-eCharger](https://go-e.co/produkte/go-echarger-home/) Wallbox Version CM-03 with API V2 
   (older version vithout 1/ 3 phase switch only). 11kW or 22kW
@@ -31,7 +31,6 @@ EVS-1 uses surplus energy of photovoltaic installations. Depending on solar powe
 ## Open Source
 
 This software may be reused and adapted by respecting the MIT License. This project is based in parts on other open source projects:
-
 [FreeSimpleGUI](https://github.com/spyoungtech/FreeSimpleGUI/tree/main) graphical interface tool
 
 [go-eCharger API V2](https://github.com/goecharger/go-eCharger-API-v2)  WLAN or Internet access to the go-eCharger Wallbox  or  or  
@@ -40,7 +39,7 @@ This software may be reused and adapted by respecting the MIT License. This proj
 
 [SolarEdge API](https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf)
 
-[zozo](https://github.com/niosega/zozo) Renault ZOE server access library, modified
+[zozo](https://github.com/niosega/zozo) Renault ZOE server access library, modified. (Not using python Renault API)
 
 ## Preiliminary Screenshots
 
