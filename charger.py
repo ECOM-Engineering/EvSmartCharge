@@ -3,6 +3,7 @@
 
 from json import JSONDecodeError
 import requests
+
 from requests import ConnectionError
 
 # API V1 see: https://github.com/goecharger/go-eCharger-API-v1

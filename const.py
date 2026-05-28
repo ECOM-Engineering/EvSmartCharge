@@ -10,7 +10,7 @@ from os import path as LogPath
 projectRoot = str(Path(__file__).parent)
 print("Project Root = ", projectRoot)
 
-C_APP_VERSION = '0.9.0rc5'
+C_APP_VERSION = '0.9.0rc6'
 configFile = projectRoot + "/evs.cfg"
 C_DEFAULT_SETTINGS_FILE = projectRoot + "/PV_Manager.json"
 C_INI_FILE = projectRoot + "/evsGUI.ini"
